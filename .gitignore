@@ -1,0 +1,10 @@
+/node_modules
+/build
+/.idea
+/.now
+.DS_Store
+.env
+.eslintcache
+.vscode
+.vercel
+yarn-error.log
