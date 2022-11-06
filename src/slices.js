@@ -1,11 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { VIEWS } from "const/Constants";
 
-export const getPreloaderState = ({ ui : { preloaderShown }}) => preloaderShown;
-
-export const getCurrentView = ({ ui : { currentView }}) => currentView;
-
-export default createSlice({
+export const uiSlice = createSlice({
   name: "ui",
   initialState: {
     preloaderShown: true,
@@ -15,4 +11,12 @@ export default createSlice({
     togglePreloader: (state, { payload }) => ({ ...state, preloaderShown: payload }),
     setCurrentView: (state, { payload }) => ({ ...state, currentView: payload }),
   }
-})
+});
+
+export const textsSlice = createSlice({
+  name: "texts",
+  initialState: {},
+  reducers: {
+    setTexts: (state, { payload }) => payload,
+  }
+});

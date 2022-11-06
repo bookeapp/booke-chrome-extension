@@ -1,14 +1,14 @@
 import { VIEWS } from "const/Constants";
-import Logo from "lib/Logo";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import ui from "slices/ui";
+import { uiSlice } from "slices";
+import Logo from "./lib/Logo";
 
 const Main = () => {  
   const dispatch = useDispatch();
     
   const handleButtonClick = useCallback(() => {    
-    dispatch(ui.actions.setCurrentView(VIEWS.DASHBOARD));
+    dispatch(uiSlice.actions.setCurrentView(VIEWS.DASHBOARD));
   }, []);
   
   return (

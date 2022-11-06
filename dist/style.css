@@ -21,3 +21,43 @@
       width: 27px; }
     #booke-extension .Main:hover {
       box-shadow: 0 5px 20px rgba(158, 162, 171, 0.3); }
+  #booke-extension .Preloader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0267d4;
+    font-size: 0.75rem; }
+    #booke-extension .Preloader.absolute, #booke-extension .Preloader.fixed {
+      z-index: 9;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.4); }
+    #booke-extension .Preloader.absolute {
+      position: absolute; }
+    #booke-extension .Preloader.fixed {
+      position: fixed; }
+    #booke-extension .Preloader .animation {
+      position: relative; }
+      #booke-extension .Preloader .animation span {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        animation: booke-ext-flashing 0.5s infinite linear alternate;
+        border-radius: 50%;
+        background-color: currentColor; }
+        #booke-extension .Preloader .animation span + span {
+          margin-left: 0.5em;
+          animation-delay: 0.25s; }
+          #booke-extension .Preloader .animation span + span + span {
+            animation-delay: 0.5s; }
+
+@keyframes booke-ext-flashing {
+  0% {
+    opacity: 1; }
+  50%,
+  100% {
+    opacity: 0.1; } }
