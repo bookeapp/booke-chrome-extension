@@ -1,0 +1,20 @@
+@import "./config";
+
+.table {
+  width: 100%;
+  .tableRow {
+    display: flex;
+  }
+  .tableCell {
+    display: flex;
+    align-items: center;
+    width: 1px;
+    flex: 1;
+    min-height: 36px;
+    padding: $contentDefaultIndent / 2;
+    &.tableHead {
+      font-size: 11px;
+      color: $uiMediumDarkColor;
+    }
+  }
+}

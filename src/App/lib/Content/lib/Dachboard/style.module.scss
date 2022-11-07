@@ -1,0 +1,51 @@
+@import "config";
+
+.dashboard {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 332px;
+  min-height: 260px;
+  background: $uiWhiteColor;
+  border: 1px solid $uiBorderColor;
+  box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
+  border-radius: $uiBorderRadius;
+  .header {
+    padding: $contentDefaultIndent * 2;
+    border-bottom: 1px solid $uiBorderColor;
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;     
+      .logo {
+        svg {
+          display: block;
+        }
+      }     
+      .close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        &:hover {
+          background-color: #f5f5f5;
+        }
+        &::after {
+          display: block;
+          width: 12px;
+          height: 2px;
+          border-radius: 2px;
+          background-color: #80838f;
+          content: "";
+        }
+      }
+    }      
+    .business {
+      font-size: 12px;
+      line-height: 14px;
+      margin-top: $contentDefaultIndent * 2;
+    }
+  }
+}

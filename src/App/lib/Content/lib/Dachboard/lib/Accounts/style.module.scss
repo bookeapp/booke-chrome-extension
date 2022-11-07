@@ -1,0 +1,36 @@
+@import "config";
+
+.accounts {
+  padding: $contentDefaultIndent * 2;  
+  .title {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: $contentDefaultIndent * 1.5;
+  }
+  .table {
+    .nameCell {
+      width: 147px;
+      flex: 147;
+      padding-left: 0;
+    }
+    .toReconcileCell {
+      width: 64px;
+      flex: 64;  
+      justify-content: center;
+      .badge {
+        width: 34px;
+      }
+    }
+    .actionCell {
+      width: 62px;
+      flex: 62;     
+      padding-right: 0;   
+      .button {
+        padding-right: 6px;
+        svg {
+          margin-left: 0.3em;
+        }
+      }
+    } 
+  }
+}

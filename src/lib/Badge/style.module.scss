@@ -1,0 +1,12 @@
+@import "config";
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px;
+  text-align: center;    
+  color: $uiWhiteColor;
+  background-color: $uiNegativeColor;
+  border-radius: 10px;
+}

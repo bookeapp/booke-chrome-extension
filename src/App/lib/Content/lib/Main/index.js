@@ -1,3 +1,5 @@
+import Css from "./style.module.scss";
+
 import { VIEWS } from "const/Constants";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
@@ -12,7 +14,7 @@ const Main = () => {
   }, []);
   
   return (
-    <div className="Main" onClick={handleButtonClick}>
+    <div className={Css.main} onClick={handleButtonClick}>
       <Logo />
     </div>
   );
