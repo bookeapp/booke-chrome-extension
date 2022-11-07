@@ -1,11 +1,11 @@
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
 
-module.exports = (env) => {  
+module.exports = () => {  
   return {
     entry: "./src/index.js",
     output: {
-      path: path.resolve(__dirname, env.WEBPACK_BUILD ? "build" : "dist"),
+      path: path.resolve(__dirname, "dist"),
       filename: "content.js",
     },
     resolve: {
@@ -37,19 +37,20 @@ module.exports = (env) => {
         },
         {
           test: /\.scss$/i,
-          exclude: /node_modules/,
-          generator: {
-            filename: "style.css",
-          },
+          exclude: /node_modules/,          
           use: [
-            "style-loader",
+            {
+              loader: "style-loader",
+            },
             {
               loader: "css-loader",
               options: {
                 modules: true,
               },
             },
-            "sass-loader",         
+            { 
+              loader: "sass-loader",
+            },         
           ],
         },
       ],

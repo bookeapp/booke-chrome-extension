@@ -12,6 +12,7 @@
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^8.0.1",
     "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^2.6.1",
     "node-sass": "^7.0.3",
     "sass-loader": "^13.1.0",
     "style-loader": "^3.3.1",
@@ -22,9 +23,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ./src/**/*.js",
-    "watch": "webpack --watch --mode=development",
+    "watch": "webpack --watch --config webpack.dev.js",
     "start": "webpack serve",
-    "build": "webpack --mode=production"
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -42,8 +43,6 @@
     "classnames": "^2.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
-    "redux-devtools-extension": "^2.13.9",
-    "redux-thunk": "^2.4.2"
+    "react-redux": "^8.0.5"
   }
 }
