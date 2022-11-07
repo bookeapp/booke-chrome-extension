@@ -41,14 +41,6 @@ module.exports = {
             loader: "file-loader",
             options: { name: "[name].css" }
           },
-          "style-loader",
-          {
-            loader: "css-loader",
-            options: {
-              importLoaders: 1,
-              modules: true,
-            },
-          },
           "sass-loader",         
         ],
       },

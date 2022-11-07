@@ -6,9 +6,52 @@
   height: 72px;
   right: 50px;
   top: 200px;  
-  background: #FFFFFF;
+  background: $uiWhiteColor;
+  color: $uiFontColor;
+  font-size: $uiFontSize;
+  font-family: $uiFontFamily;
+  line-height: 16px;
   &, * {
     box-sizing: border-box;
+  }  
+  .table {
+    width: 100%;
+    .table-row {
+      display: flex;
+    }
+    .table-cell {
+      display: flex;
+      align-items: center;
+      width: 1px;
+      flex: 1;
+      min-height: 36px;
+      padding: $contentDefaultIndent / 2;
+      &.table-head {
+        font-size: 11px;
+        color: $uiMediumDarkColor;
+      }
+    }
+  }
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 1;
+    padding: 4px;
+    text-align: center;    
+    color: $uiWhiteColor;
+    background-color: $uiNegativeColor;
+    border-radius: 10px;
+  }
+  .button {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    height: 24px;
+    padding: 0 $contentDefaultIndent * 1.5;
+    background-color: $uiWhiteColor;
+    border-radius: $uiBorderRadius;
+    border: 1px solid $uiBorderColor;
   }
   .Main {
     display: flex;
@@ -80,6 +123,78 @@
     border: 1px solid $uiBorderColor;
     box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
     border-radius: $uiBorderRadius;
+    .header {
+      padding: $contentDefaultIndent * 2;
+      border-bottom: 1px solid $uiBorderColor;
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;     
+        .logo {
+          svg {
+            display: block;
+          }
+        }     
+        .close {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          cursor: pointer;
+          &:hover {
+            background-color: #f5f5f5;
+          }
+          &::after {
+            display: block;
+            width: 12px;
+            height: 2px;
+            border-radius: 2px;
+            background-color: #80838f;
+            content: "";
+          }
+        }
+      }      
+      .business {
+        font-size: 12px;
+        line-height: 14px;
+        margin-top: $contentDefaultIndent * 2;
+      }
+    }
+  }
+  .Accounts {
+    padding: $contentDefaultIndent * 2;
+    .title {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: $contentDefaultIndent * 1.5;
+    }
+    .table {
+      .name-cell {
+        width: 147px;
+        flex: 147;
+        padding-left: 0;
+      }
+      .to-reconcile-cell {
+        width: 64px;
+        flex: 64;  
+        justify-content: center;
+        .badge {
+          width: 34px;
+        }
+      }
+      .action-cell {
+        width: 62px;
+        flex: 62;     
+        padding-right: 0;   
+        .button {
+          padding-right: 6px;
+          svg {
+            margin-left: 0.3em;
+          }
+        }
+      }
+    }
   }
 }
 

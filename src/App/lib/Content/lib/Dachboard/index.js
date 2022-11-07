@@ -1,21 +1,29 @@
-import Css from "./style.module.scss";
-
-import React from "react";
-import { useSelector } from "react-redux";
-import { getBusinesses } from "selectors";
+import { VIEWS } from "const/Constants";
+import React, { useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { uiSlice } from "slices";
+import Accounts from "./lib/Accounts";
 import LogoFull from "./lib/LogoFull";
 
 const Dashboard = () => {
-  const businesses = useSelector(getBusinesses);
-  
-  console.log(">>> businesses", Css);
-  
+  const dispatch = useDispatch();
+    
+  const handleCloseClick = useCallback(() => {
+    dispatch(uiSlice.actions.setCurrentView(VIEWS.MAIN));
+  }, []);
+    
   return (
     <div  className="Dashboard">
       <div className="header">
-        <div className="logo"><LogoFull /></div>
-        <div></div>
+        <div className="top">
+          <div className="logo"><LogoFull /></div>
+          <div className="close" onClick={handleCloseClick} />
+        </div>
+        <div className="business">
+          New business from Xero
+        </div>
       </div>
+      <Accounts />     
     </div>
   );
 };

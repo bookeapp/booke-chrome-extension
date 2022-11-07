@@ -1,27 +1,163 @@
+#booke-extension {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  right: 50px;
+  top: 200px;
+  background: #fff;
+  color: #17191c;
+  font-size: 12px;
+  font-family: "Roboto", sans-serif;
+  line-height: 16px; }
+  #booke-extension, #booke-extension * {
+    box-sizing: border-box; }
+  #booke-extension .table {
+    width: 100%; }
+    #booke-extension .table .table-row {
+      display: flex; }
+    #booke-extension .table .table-cell {
+      display: flex;
+      align-items: center;
+      width: 1px;
+      flex: 1;
+      min-height: 36px;
+      padding: 4px; }
+      #booke-extension .table .table-cell.table-head {
+        font-size: 11px;
+        color: #8c96a0; }
+  #booke-extension .badge {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 1;
+    padding: 4px;
+    text-align: center;
+    color: #fff;
+    background-color: #e24e45;
+    border-radius: 10px; }
+  #booke-extension .button {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    height: 24px;
+    padding: 0 12px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #eaebee; }
+  #booke-extension .Main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
+    border-radius: 50%;
+    border: 1px solid #EAEBEE; }
+    #booke-extension .Main svg {
+      width: 27px; }
+    #booke-extension .Main:hover {
+      box-shadow: 0 5px 20px rgba(158, 162, 171, 0.3); }
+  #booke-extension .Preloader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0267d4;
+    font-size: 12px; }
+    #booke-extension .Preloader.absolute, #booke-extension .Preloader.fixed {
+      z-index: 9;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.4); }
+    #booke-extension .Preloader.absolute {
+      position: absolute; }
+    #booke-extension .Preloader.fixed {
+      position: fixed; }
+    #booke-extension .Preloader .animation {
+      position: relative; }
+      #booke-extension .Preloader .animation span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        animation: booke-ext-flashing 0.5s infinite linear alternate;
+        border-radius: 50%;
+        background-color: currentColor; }
+        #booke-extension .Preloader .animation span + span {
+          margin-left: 4px;
+          animation-delay: 0.25s; }
+          #booke-extension .Preloader .animation span + span + span {
+            animation-delay: 0.5s; }
+  #booke-extension .Dashboard {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 332px;
+    min-height: 260px;
+    background: #fff;
+    border: 1px solid #eaebee;
+    box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
+    border-radius: 4px; }
+    #booke-extension .Dashboard .header {
+      padding: 16px;
+      border-bottom: 1px solid #eaebee; }
+      #booke-extension .Dashboard .header .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; }
+        #booke-extension .Dashboard .header .top .logo svg {
+          display: block; }
+        #booke-extension .Dashboard .header .top .close {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          cursor: pointer; }
+          #booke-extension .Dashboard .header .top .close:hover {
+            background-color: #f5f5f5; }
+          #booke-extension .Dashboard .header .top .close::after {
+            display: block;
+            width: 12px;
+            height: 2px;
+            border-radius: 2px;
+            background-color: #80838f;
+            content: ""; }
+      #booke-extension .Dashboard .header .business {
+        font-size: 12px;
+        line-height: 14px;
+        margin-top: 16px; }
+  #booke-extension .Accounts {
+    padding: 16px; }
+    #booke-extension .Accounts .title {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 12px; }
+    #booke-extension .Accounts .table .name-cell {
+      width: 147px;
+      flex: 147;
+      padding-left: 0; }
+    #booke-extension .Accounts .table .to-reconcile-cell {
+      width: 64px;
+      flex: 64;
+      justify-content: center; }
+      #booke-extension .Accounts .table .to-reconcile-cell .badge {
+        width: 34px; }
+    #booke-extension .Accounts .table .action-cell {
+      width: 62px;
+      flex: 62;
+      padding-right: 0; }
+      #booke-extension .Accounts .table .action-cell .button {
+        padding-right: 6px; }
+        #booke-extension .Accounts .table .action-cell .button svg {
+          margin-left: 0.3em; }
 
-      import API from "!../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js";
-      import domAPI from "!../node_modules/style-loader/dist/runtime/styleDomAPI.js";
-      import insertFn from "!../node_modules/style-loader/dist/runtime/insertBySelector.js";
-      import setAttributes from "!../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js";
-      import insertStyleElement from "!../node_modules/style-loader/dist/runtime/insertStyleElement.js";
-      import styleTagTransformFn from "!../node_modules/style-loader/dist/runtime/styleTagTransform.js";
-      import content, * as namedExport from "!!../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/sass-loader/dist/cjs.js!./style.scss";
-      
-      
-
-var options = {};
-
-options.styleTagTransform = styleTagTransformFn;
-options.setAttributes = setAttributes;
-
-      options.insert = insertFn.bind(null, "head");
-    
-options.domAPI = domAPI;
-options.insertStyleElement = insertStyleElement;
-
-var update = API(content, options);
-
-
-
-export * from "!!../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!../node_modules/sass-loader/dist/cjs.js!./style.scss";
-       export default content && content.locals ? content.locals : undefined;
+@keyframes booke-ext-flashing {
+  0% {
+    opacity: 1; }
+  50%,
+  100% {
+    opacity: 0.1; } }
