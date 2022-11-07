@@ -1,19 +1,18 @@
-import React from "react";
-import { useSelector } from "react-redux";
 import { getPreloaderState } from "selectors";
+import { useSelector } from "react-redux";
 import Content from "./lib/Content";
 import Preloader from "./lib/Preloader";
+import React from "react";
 
-const App = () => {  
+const App = () => {
   const preloaderState = useSelector(getPreloaderState);
-  
+
   return (
     <>
       <Content />
-      
-      {/* preloaderState && */ (<Preloader absolute />)}
+      {preloaderState && (<Preloader absolute />)}
     </>
   );
-}
+};
 
 export default App;

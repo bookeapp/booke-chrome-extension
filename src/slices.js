@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { VIEWS } from "const/Constants";
 
 export const uiSlice = createSlice({
   name: "ui",
   initialState: {
-    preloaderShown: true,
+    preloaderShown: false,
     currentView: VIEWS.DASHBOARD
   },
   reducers: {
@@ -20,3 +20,17 @@ export const textsSlice = createSlice({
     setTexts: (state, { payload }) => payload,
   }
 });
+
+export const businessesSlice = createSlice({
+  name: "businesses",
+  initialState: {
+    businessesFetching: false,
+    data: [],
+  },
+  reducers: {}
+});
+
+/* export const fetchPosts = createAsyncThunk("businesses/fetch", async () => {
+  const response = await client.get("/api/businesses")
+  return response.data;
+}) */

@@ -1,7 +1,0 @@
-/node_modules
-/public
-/build
-.eslintrc.js
-.stylelintrc.js
-craco.config.js
-next.config.js
