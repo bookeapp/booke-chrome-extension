@@ -1,4 +1,5 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
 
@@ -21,6 +22,11 @@ module.exports = () => {
     plugins: [
       new Dotenv(),
       new MiniCssExtractPlugin(),
+      new CopyPlugin({
+        patterns: [
+          { from: "assets" }
+        ],
+      }),
     ],
     module: {
       rules: [
