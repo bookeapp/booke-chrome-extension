@@ -46,7 +46,7 @@ const Accounts = () => {
               <Badge className={Css.badge}>{count}</Badge>
             </TableCell>
             <TableCell className={Css.actionCell}>
-              <Button className={Css.button}>Go to <IconArrowRight /></Button>
+              <Button size="small" className={Css.button}>Go to <IconArrowRight /></Button>
             </TableCell>
           </TableRow>
         ))}

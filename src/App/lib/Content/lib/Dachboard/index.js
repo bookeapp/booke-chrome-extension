@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { uiSlice } from "slices";
 import Accounts from "./lib/Accounts";
 import LogoFull from "./lib/LogoFull";
+import CurrentAccount from "./lib/CurrentAccount";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -13,6 +14,8 @@ const Dashboard = () => {
   const handleCloseClick = useCallback(() => {
     dispatch(uiSlice.actions.setCurrentView(VIEWS.MAIN));
   }, []);
+  
+  const emptyState = true;
     
   return (
     <div className={Css.dashboard}>
@@ -25,7 +28,18 @@ const Dashboard = () => {
           New business from Xero
         </div>
       </div>
-      <Accounts />     
+      {emptyState
+        ? (
+          <div className={Css.emptyState}>
+            Well done! You have no transactions to reconcile
+          </div>
+        )
+        : (
+          <>
+            <CurrentAccount />
+            <Accounts />  
+          </>
+        )}   
     </div>
   );
 };

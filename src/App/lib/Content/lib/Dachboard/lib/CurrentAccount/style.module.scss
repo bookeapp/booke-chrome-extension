@@ -1,0 +1,63 @@
+@import "config";
+
+.currentAccount {
+  padding: $contentDefaultIndent * 2;
+  border-bottom: 1px solid $uiBorderColor;
+  .header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: $contentDefaultIndent * 2;
+    .name {}
+    .count {
+      font-weight: 500;
+    }
+  }
+  .progress {
+    .label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: $uiMediumDarkColor;
+      margin-bottom: $contentDefaultIndent;
+    }
+    .bar {
+      height: 8px;
+      border-radius: 4px;
+      position: relative;
+      background-color: $uiBorderColor;
+      .fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        border-radius: 4px;   
+        background-color: $uiPrimaryColor;     
+      }
+    }
+  }
+  .message {
+    display: flex;
+    align-items: center;
+    padding: $contentDefaultIndent * 2;  
+    border-radius: $uiBorderRadius;  
+    background-color: rgba($uiPositiveColor, 0.1);
+    .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $uiWhiteColor;
+      width: 20px;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: $uiPositiveColor;
+      box-shadow: 0 0 0 4px rgba($uiPositiveColor, 0.2);
+    }
+    .text {
+      flex: auto;
+      margin-left: $contentDefaultIndent * 2;  
+    }
+  }
+}

@@ -4,8 +4,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 332px;
-  min-height: 260px;
+  width: 356px;
   background: $uiWhiteColor;
   border: 1px solid $uiBorderColor;
   box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
@@ -47,5 +46,14 @@
       line-height: 14px;
       margin-top: $contentDefaultIndent * 2;
     }
+  }
+  .emptyState {
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    color: $uiMediumDarkColor;
+    max-width: 180px;
+    padding: $contentDefaultIndent * 3 $contentDefaultIndent * 2;
+    margin: auto;
   }
 }
