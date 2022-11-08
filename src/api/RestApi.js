@@ -1,6 +1,12 @@
-import Errors from "const/Errors";
 import { objectToQueryString } from "utils";
 
+const REQUEST_ERROR = "requestError";
+
+const SESSION_EXPIRED = "sessionExpired";
+
+const TOO_MANY_ERRORS = "tooManyErrors";
+
+const CRITICAL_DATA_NOT_LOADED = "criticalDataNotLoaded";
 
 const REQUEST_METHODS = {
   GET: "GET",
@@ -10,40 +16,43 @@ const REQUEST_METHODS = {
   PATCH: "PATCH"
 };
 
-export default class RestApi {  
+class RestApi {  
   apiUrl = null;
   
-  constructor(apiUrl = "", token) {
+  constructor(apiUrl = "") {
     this.apiUrl = apiUrl;
+  }
+  
+  setToken(token) {
     this.token = token;
   }
 
   async get(path, urlParams) {
-    const response = await this.makeRequest(RestApi.REQUEST_METHODS.GET, path, urlParams);
+    const response = await this.makeRequest(REQUEST_METHODS.GET, path, urlParams);
 
     return response;
   }
 
   async put(path, urlParams, payload, binary) {
-    const response = await this.makeRequest(RestApi.REQUEST_METHODS.PUT, path, urlParams, payload, binary);
+    const response = await this.makeRequest(REQUEST_METHODS.PUT, path, urlParams, payload, binary);
 
     return response;
   }
 
   async post(path, urlParams, payload, binary) {
-    const response = await this.makeRequest(RestApi.REQUEST_METHODS.POST, path, urlParams, payload, binary);
+    const response = await this.makeRequest(REQUEST_METHODS.POST, path, urlParams, payload, binary);
 
     return response;
   }
 
   async patch(path, urlParams, payload) {
-    const response = await this.makeRequest(RestApi.REQUEST_METHODS.PATCH, path, urlParams, payload);
+    const response = await this.makeRequest(REQUEST_METHODS.PATCH, path, urlParams, payload);
 
     return response;
   }
 
   async delete(path, urlParams, payload) {
-    const response = await this.makeRequest(RestApi.REQUEST_METHODS.DELETE, path, urlParams, payload);
+    const response = await this.makeRequest(REQUEST_METHODS.DELETE, path, urlParams, payload);
 
     return response;
   }
@@ -64,15 +73,19 @@ export default class RestApi {
         }
       );
       
-      if (response.status === Constants.HTTP_STATUSES.UNAUTHORIZED) throw Errors.SESSION_EXPIRED;
+      if (response.status === Constants.HTTP_STATUSES.UNAUTHORIZED) throw SESSION_EXPIRED;
         
       if (response.ok) {        
         return response.json();
       } else {
-        throw Errors.REQUEST_ERROR;
+        throw REQUEST_ERROR;
       }
     } catch (error) {
-      throw Errors.REQUEST_ERROR;
+      throw REQUEST_ERROR;
     }
   }
 }
+
+const restApi = new RestApi(process.env.MAIN_API_URL);
+
+export default restApi;

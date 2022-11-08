@@ -4,8 +4,8 @@ import { VIEWS } from "const/Constants";
 export const uiSlice = createSlice({
   name: "ui",
   initialState: {
-    preloaderShown: false,
-    currentView: VIEWS.DASHBOARD
+    preloaderShown: true,
+    currentView: VIEWS.MAIN
   },
   reducers: {
     togglePreloader: (state, { payload }) => ({ ...state, preloaderShown: payload }),
@@ -18,6 +18,14 @@ export const textsSlice = createSlice({
   initialState: {},
   reducers: {
     setTexts: (state, { payload }) => payload,
+  }
+});
+
+export const userSlice = createSlice({
+  name: "user",
+  initialState: { data: null },
+  reducers: {
+    setUserData: (state, { payload }) => ({ ...state, data: payload }),
   }
 });
 

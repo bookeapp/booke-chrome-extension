@@ -1,0 +1,9 @@
+/node_modules
+/public
+/build
+/dist
+/_dist
+/assets
+.eslintrc.js
+webpack.dev.js
+webpack.prod.js

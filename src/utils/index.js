@@ -1,9 +1,3 @@
-import { compareTwoStrings } from "string-similarity";
-import { createSelectorCreator, defaultMemoize } from "reselect";
-import Constants from "const/Constants";
-import moment from "moment";
-import objectHash from "object-hash";
-
 export function setTimeout(callback, interval, ...restArgs) {
   const timeoutId = window.setTimeout(callback, interval, ...restArgs);
 

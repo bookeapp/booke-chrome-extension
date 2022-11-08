@@ -1,6 +1,6 @@
-import defaultTexts from "assets/texts/en.json";
+import { businessesSlice, textsSlice, uiSlice, userSlice } from "slices";
 import { configureStore } from "@reduxjs/toolkit";
-import { uiSlice, textsSlice, businessesSlice } from "slices";
+import defaultTexts from "assets/texts/en.json";
 
 let store = null;
 
@@ -18,7 +18,8 @@ store = configureStore({
   reducer: {
     ui: uiSlice.reducer,
     texts: textsSlice.reducer,
-    businesses: businessesSlice.reducer,
+    user: userSlice.reducer,
+    businesses: businessesSlice.reducer
   },
   preloadedState: {
     texts: defaultTexts,
@@ -28,7 +29,7 @@ store = configureStore({
         name: "New business from Xero"
       }]
     }
-  },
+  }
 });
 
 export default store;

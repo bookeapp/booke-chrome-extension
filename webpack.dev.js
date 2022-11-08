@@ -15,11 +15,18 @@ module.exports = () => {
       ],
     },
     devServer: {
+      hot: true,
       static: "./",
     },
     plugins: [
       new Dotenv(),
     ],
+    devServer: {
+      static: {
+        directory: __dirname,
+      },
+      port: 3000,
+    },
     module: {
       rules: [
         {

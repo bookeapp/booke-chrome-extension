@@ -1,6 +1,6 @@
-import { createAuth0Client } from "@auth0/auth0-spa-js";
+import { createAuth0Client as createAuthZeroClient } from "@auth0/auth0-spa-js";
 
-export default class AuthZeroApi {
+class AuthZeroApi {
   client = null;
 
   domain = null;
@@ -20,7 +20,7 @@ export default class AuthZeroApi {
 
   async getClient() {
     if (!this.client) {
-      this.client = await createAuth0Client({
+      this.client = await createAuthZeroClient({
         domain: this.domain,
         clientId: this.clientId,
         cacheLocation: "localstorage",
@@ -30,7 +30,7 @@ export default class AuthZeroApi {
         }
       });
     }
-    
+
     return this.client;
   }
 
@@ -39,15 +39,17 @@ export default class AuthZeroApi {
       const client = await this.getClient();
 
       const token = await client.getTokenSilently({ ignoreCache: !callbackState });
+
       if (!token) return null;
-      
+
       const payload = JSON.parse(atob(token.split(".")[1]));
 
       if (!payload || !Array.isArray(payload.aud) || !payload.aud.includes(this.audience)) return null;
+
       return token;
     } catch (error) {
       return null;
-    }    
+    }
   }
 
   async getUserInfo() {
@@ -98,3 +100,9 @@ export default class AuthZeroApi {
     }
   }
 }
+
+export default new AuthZeroApi(
+  process.env.AUTH_DOMAIN,
+  process.env.AUTH_AUDIENCE,
+  process.env.AUTH_CLIENT_ID
+);
