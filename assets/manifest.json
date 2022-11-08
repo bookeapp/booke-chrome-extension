@@ -14,7 +14,7 @@
       "js": [
         "content.js"
       ],
-      "css": ["styles.css"],
+      "css": ["main.css"],
       "matches": [
         "https://go.xero.com/*"
       ]

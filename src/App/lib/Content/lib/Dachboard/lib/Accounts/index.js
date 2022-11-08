@@ -16,12 +16,18 @@ const Accounts = () => {
   const businessesData = useSelector(getBusinessesData);
 
   const filteredBusiness = useMemo(() => {
-    return businessesData.filter(({ xeroAccountId }) => {
-      return normalizeId(xeroAccountId) !== accountId;
+    return businessesData.filter(({ xeroAccountId, transactions }) => {
+      return normalizeId(xeroAccountId) !== accountId && transactions;
     });
   }, [accountId, businessesData]);
 
-  if (!filteredBusiness.length) return null;
+  if (!filteredBusiness.length) {
+    return (
+      <div className={Css.emptyState}>
+        Well done! You have no transactions to reconcile
+      </div>
+    );
+  }
 
   return (
     <div className={Css.accounts}>
@@ -32,7 +38,7 @@ const Accounts = () => {
           <TableHead className={Css.toReconcileCell}>To Reconcile</TableHead>
           <TableHead className={Css.actionCell} />
         </TableRow>
-        {businessesData.map(({ xeroAccountId, name, transactions }) => (
+        {filteredBusiness.map(({ xeroAccountId, name, transactions }) => (
           <TableRow key={xeroAccountId}>
             <TableCell className={Css.nameCell}>{name}</TableCell>
             <TableCell className={Css.toReconcileCell}>

@@ -1,4 +1,4 @@
-import { objectToQueryString } from "utils";
+import { log, objectToQueryString } from "utils";
 
 const REQUEST_ERROR = "requestError";
 
@@ -59,6 +59,8 @@ class RestApi {
   }
 
   async makeRequest(method, path, urlParams, payload) {
+    log("request", { method, path, urlParams, payload });
+
     try {
       const searchString = urlParams ? objectToQueryString(urlParams) : null;
 
@@ -77,7 +79,11 @@ class RestApi {
       if (response.status === HTTP_STATUSES.UNAUTHORIZED) throw SESSION_EXPIRED;
 
       if (response.ok) {
-        return response.json();
+        const responseJson = await response.json();
+
+        log("response", responseJson);
+
+        return responseJson;
       }
       throw REQUEST_ERROR;
     } catch (error) {

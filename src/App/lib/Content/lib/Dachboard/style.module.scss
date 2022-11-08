@@ -47,13 +47,4 @@
       margin-top: $contentDefaultIndent * 2;
     }
   }
-  .emptyState {
-    font-size: 12px;
-    line-height: 1.5;
-    text-align: center;
-    color: $uiMediumDarkColor;
-    max-width: 180px;
-    padding: $contentDefaultIndent * 3 $contentDefaultIndent * 2;
-    margin: auto;
-  }
 }

@@ -10,7 +10,8 @@
   cursor: pointer;
   box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
   border-radius: 50%;
-  border: 1px solid #EAEBEE;
+  border: 1px solid $uiBorderColor;
+  background: rgba($uiWhiteColor, 0.8);
   svg {
     width: 27px;
   }

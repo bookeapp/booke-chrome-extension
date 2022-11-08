@@ -1,5 +1,3 @@
-import "./style.scss";
-
 import { Provider } from "react-redux";
 import App from "App";
 import React from "react";
