@@ -14,17 +14,14 @@ module.exports = () => {
         "node_modules"
       ],
     },
-    devServer: {
-      hot: true,
-      static: "./",
-    },
     plugins: [
       new Dotenv(),
     ],
     devServer: {
       static: {
-        directory: __dirname,
+        directory: path.resolve(__dirname, "dist"),
       },
+      historyApiFallback: true,
       port: 3000,
     },
     module: {

@@ -4,10 +4,6 @@ const REQUEST_ERROR = "requestError";
 
 const SESSION_EXPIRED = "sessionExpired";
 
-const TOO_MANY_ERRORS = "tooManyErrors";
-
-const CRITICAL_DATA_NOT_LOADED = "criticalDataNotLoaded";
-
 const REQUEST_METHODS = {
   GET: "GET",
   POST: "POST",
@@ -16,13 +12,18 @@ const REQUEST_METHODS = {
   PATCH: "PATCH"
 };
 
-class RestApi {  
+const HTTP_STATUSES = {
+  OK: 200, // eslint-disable-line no-magic-numbers
+  UNAUTHORIZED: 401 // eslint-disable-line no-magic-numbers
+};
+
+class RestApi {
   apiUrl = null;
-  
+
   constructor(apiUrl = "") {
     this.apiUrl = apiUrl;
   }
-  
+
   setToken(token) {
     this.token = token;
   }
@@ -60,26 +61,25 @@ class RestApi {
   async makeRequest(method, path, urlParams, payload) {
     try {
       const searchString = urlParams ? objectToQueryString(urlParams) : null;
-      
+
       const response = await fetch(
         `${this.apiUrl}${path}${searchString ? `?${searchString}` : ""}`,
         {
           method,
-          headers: { 
+          headers: {
             Authorization: `Bearer ${this.token}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify(payload)
         }
       );
-      
-      if (response.status === Constants.HTTP_STATUSES.UNAUTHORIZED) throw SESSION_EXPIRED;
-        
-      if (response.ok) {        
+
+      if (response.status === HTTP_STATUSES.UNAUTHORIZED) throw SESSION_EXPIRED;
+
+      if (response.ok) {
         return response.json();
-      } else {
-        throw REQUEST_ERROR;
       }
+      throw REQUEST_ERROR;
     } catch (error) {
       throw REQUEST_ERROR;
     }

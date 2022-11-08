@@ -1,27 +1,29 @@
-export function setTimeout(callback, interval, ...restArgs) {
+export const setTimeout = (callback, interval, ...restArgs) => {
   const timeoutId = window.setTimeout(callback, interval, ...restArgs);
 
   return () => clearTimeout(timeoutId);
-}
+};
 
-export function setInterval(callback, interval, ...restArgs) {
+export const setInterval = (callback, interval, ...restArgs) => {
   const intervalId = window.setInterval(callback, interval, ...restArgs);
 
   return () => clearInterval(intervalId);
-}
+};
 
-export function parseQueryString(query) {
+export const parseQueryString = (query) => {
   return (query || "").replace(/^\?/, "").split("&").reduce((envVars, keyValuePair) => {
     let [key, value] = keyValuePair.split("=");
+
     if (value === "null") value = null;
     else if (value === "false") value = false;
     else value = value === undefined ? true : decodeURIComponent(value);
-    envVars[key] = value;      
+    envVars[key] = value;
+
     return envVars;
   }, {});
-}
+};
 
-export function objectToQueryString(paramObj, withoutUrlEncode = false) {
+export const objectToQueryString = (paramObj, withoutUrlEncode = false) => {
   if (!paramObj) return "";
 
   return Object.keys(paramObj).map((key) => {
@@ -34,9 +36,9 @@ export function objectToQueryString(paramObj, withoutUrlEncode = false) {
         value === true ? "" : `=${(withoutUrlEncode ? value : encodeURIComponent(value))}`}`;
     });
   }).filter(Boolean).join("&");
-}
+};
 
-export function storageValue(key, value, useSessionStorage = false) {
+export const storageValue = (key, value, useSessionStorage = false) => {
   const storage = useSessionStorage ? window.sessionStorage : window.localStorage;
 
   try {
@@ -55,27 +57,27 @@ export function storageValue(key, value, useSessionStorage = false) {
   } catch (error) {
     return null;
   }
-}
+};
 
-export function arrayUpdateItem(array, uniqKey, uniqKeyValue, update) {
+export const arrayUpdateItem = (array, uniqKey, uniqKeyValue, update) => {
   const updateFunction = typeof update === "function" ? update : () => update;
 
   return array && array.map((item) => (item[uniqKey] === uniqKeyValue ? updateFunction(item) : item));
-}
+};
 
-export function arrayUpdateItemById(array, id, update) {
-  return Utils.arrayUpdateItem(array, "id", id, update);
-}
+export const arrayUpdateItemById = (array, id, update) => {
+  return arrayUpdateItem(array, "id", id, update);
+};
 
-export function arrayFind(array, uniqKey, uniqKeyValue, fallback) {
+export const arrayFind = (array, uniqKey, uniqKeyValue, fallback) => {
   return (array && array.find((item) => item[uniqKey] === uniqKeyValue)) || fallback;
-}
+};
 
-export function arrayFindById(array, id, fallback) {
-  return Array.isArray(array) && Utils.arrayFind(array, "id", id, fallback);
-}
+export const arrayFindById = (array, id, fallback) => {
+  return Array.isArray(array) && arrayFind(array, "id", id, fallback);
+};
 
-export function arraySort(array, props, orders) {
+export const arraySort = (array, props, orders) => {
   if (!array) return array;
 
   const sortProps = Array.isArray(props) ? props : [props];
@@ -103,5 +105,9 @@ export function arraySort(array, props, orders) {
       return 0;
     }, 0);
   });
-}
-  
+};
+
+export const log = (...args) => {
+  // eslint-disable-next-line no-console
+  console.log("%c%s", "color: #ff0", "[BOOKE]", ...args);
+};
