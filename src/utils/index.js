@@ -111,3 +111,7 @@ export const log = (...args) => {
   // eslint-disable-next-line no-console
   console.log("%c%s", "color: #ff0", "[BOOKE]", ...args);
 };
+
+export const normalizeId = (id) => {
+  return (id || "").replaceAll("-", "").toUpperCase();
+};

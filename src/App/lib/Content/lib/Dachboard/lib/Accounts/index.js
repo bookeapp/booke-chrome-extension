@@ -1,35 +1,28 @@
 import Css from "./style.module.scss";
 
-import React from "react";
-import IconArrowRight from "./lib/IconArrowRight";
-import Table, { TableCell, TableHead, TableRow } from "lib/Table";
+import { getBusinessesData } from "selectors";
+import { normalizeId } from "utils";
+import { useSelector } from "react-redux";
 import Badge from "lib/Badge";
 import Button from "lib/Button";
-
-const ACCOUNTS = [
-  {
-    id: 1,
-    name: "Stripe Bank Account",
-    count: 6
-  },
-  {
-    id: 2,
-    name: "Reserve Account CD",
-    count: 69
-  },
-  {
-    id: 3,
-    name: "Flip Cause",
-    count: 34
-  },
-  {
-    id: 4,
-    name: "Undeposited Funds",
-    count: 25
-  },
-];
+import IconArrowRight from "./lib/IconArrowRight";
+import React, { useMemo } from "react";
+import Table, { TableCell, TableHead, TableRow } from "lib/Table";
+import useEnvVars from "hooks/useEnvVars";
 
 const Accounts = () => {
+  const [{ accountID: accountId }] = useEnvVars();
+
+  const businessesData = useSelector(getBusinessesData);
+
+  const filteredBusiness = useMemo(() => {
+    return businessesData.filter(({ xeroAccountId }) => {
+      return normalizeId(xeroAccountId) !== accountId;
+    });
+  }, [accountId, businessesData]);
+
+  if (!filteredBusiness.length) return null;
+
   return (
     <div className={Css.accounts}>
       <div className={Css.title}>Accounts</div>
@@ -39,19 +32,21 @@ const Accounts = () => {
           <TableHead className={Css.toReconcileCell}>To Reconcile</TableHead>
           <TableHead className={Css.actionCell} />
         </TableRow>
-        {ACCOUNTS.map(({ id, name, count }) => (
-          <TableRow key={id}>
+        {businessesData.map(({ xeroAccountId, name, transactions }) => (
+          <TableRow key={xeroAccountId}>
             <TableCell className={Css.nameCell}>{name}</TableCell>
             <TableCell className={Css.toReconcileCell}>
-              <Badge className={Css.badge}>{count}</Badge>
+              <Badge className={Css.badge}>{transactions}</Badge>
             </TableCell>
             <TableCell className={Css.actionCell}>
-              <Button size="small" className={Css.button}>Go to <IconArrowRight /></Button>
+              <a href={`${window.location.origin}/BankRec/BankRec.aspx?accountID=${normalizeId(xeroAccountId)}`}>
+                <Button size="small" className={Css.button}>Go to <IconArrowRight /></Button>
+              </a>
             </TableCell>
           </TableRow>
         ))}
-      </Table>      
-    </div> 
+      </Table>
+    </div>
   );
 };
 

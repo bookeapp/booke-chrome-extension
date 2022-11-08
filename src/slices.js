@@ -42,7 +42,7 @@ export const businessesSlice = createSlice({
 export const fetchStats = createAsyncThunk("stats/fetch", async(shortCode) => {
   const response = await restApi.get(`${shortCode}/stats`);
 
-  return response.data;
+  return response.results;
 });
 
 export const statsSlice = createSlice({
