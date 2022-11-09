@@ -96,7 +96,7 @@ class AuthZeroApi {
     try {
       const client = await this.getClient();
 
-      await client.logout({ returnTo: this.redirectUrl });
+      await client.logout({ returnTo: window.location.href });
 
       return true;
     } catch (error) {

@@ -1,8 +1,7 @@
 import { log, objectToQueryString } from "utils";
+import authZeroApi from "./AuthZeroApi";
 
 const REQUEST_ERROR = "requestError";
-
-const SESSION_EXPIRED = "sessionExpired";
 
 const REQUEST_METHODS = {
   GET: "GET",
@@ -76,7 +75,11 @@ class RestApi {
         }
       );
 
-      if (response.status === HTTP_STATUSES.UNAUTHORIZED) throw SESSION_EXPIRED;
+      if (response.status === HTTP_STATUSES.UNAUTHORIZED) {
+        authZeroApi.logoutUser();
+
+        return null;
+      }
 
       if (response.ok) {
         const responseJson = await response.json();
