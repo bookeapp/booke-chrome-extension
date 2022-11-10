@@ -16,7 +16,7 @@ const CurrentAccount = () => {
 
   const [inProgress, setInProgress] = useState(false);
 
-  const [preloaderShown, setPreloaderShown] = useState([]);
+  const [preloaderShown, setPreloaderShown] = useState(true);
 
   const [itemsToReconcile, setItemsToReconcile] = useState([]);
 
@@ -34,7 +34,11 @@ const CurrentAccount = () => {
         return !nodes.querySelector(".statement.load");
       });
 
-      if (!nodes.length) return;
+      if (!nodes.length) {
+        setPreloaderShown(false);
+
+        return;
+      }
 
       const statementMatchedNodes = [...nodes].map((node) => {
         const matched = node.querySelector(".statement.matched");
@@ -51,6 +55,12 @@ const CurrentAccount = () => {
 
         return null;
       }).filter(Boolean);
+
+      if (!statementMatchedNodes.length) {
+        setPreloaderShown(false);
+
+        return;
+      }
 
       setTimeout(() => {
         const items = statementMatchedNodes.map((statementMatched) => {
@@ -72,9 +82,11 @@ const CurrentAccount = () => {
         log({ items });
 
         setItemsToReconcile(items);
+        setPreloaderShown(false);
       }, 0);
     } catch (exeption) {
       log("ERROR getItemsToReconcile", exeption);
+      setPreloaderShown(false);
     }
   }, []);
 
