@@ -22,6 +22,8 @@ const Accounts = () => {
   }, [accountId, businessesData]);
 
   if (!filteredBusiness.length) {
+    if (accountId) return null;
+
     return (
       <div className={Css.emptyState}>
         Well done! You have no transactions to reconcile

@@ -1,13 +1,9 @@
-import { VIEWS } from "const/Constants";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import restApi from "api/RestApi";
 
 export const uiSlice = createSlice({
   name: "ui",
-  initialState: {
-    preloaderShown: true,
-    currentView: VIEWS.MAIN
-  },
+  initialState: {},
   reducers: {
     togglePreloader: (state, { payload }) => ({ ...state, preloaderShown: payload }),
     setCurrentView: (state, { payload }) => ({ ...state, currentView: payload })

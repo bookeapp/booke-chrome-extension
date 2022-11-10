@@ -1,3 +1,5 @@
+import { STORAGE_NAME } from "const/Constants";
+
 export const setTimeout = (callback, interval, ...restArgs) => {
   const timeoutId = window.setTimeout(callback, interval, ...restArgs);
 
@@ -114,4 +116,37 @@ export const log = (...args) => {
 
 export const normalizeId = (id) => {
   return (id || "").replaceAll("-", "").toUpperCase();
+};
+
+export const getStoreData = () => {
+  try {
+    return JSON.parse(storageValue(STORAGE_NAME) || "{}");
+  } catch (exeption) {}
+
+  return {};
+};
+
+export const setStoreData = (data) => {
+  const stored = getStoreData();
+
+  storageValue(STORAGE_NAME, JSON.stringify({ ...stored, ...data }));
+};
+
+const DEFAULT_MAX_WAITING_TIME = 60000;
+
+const INTERVAL = 10;
+
+export const waitUntil = (condition, maxTime = DEFAULT_MAX_WAITING_TIME) => {
+  const start = Date.now();
+
+  return new Promise((resolve) => {
+    const inervalId = setInterval(() => {
+      const result = condition();
+
+      if (result || (Date.now() - start) > maxTime) {
+        clearInterval(inervalId);
+        resolve(result);
+      }
+    }, INTERVAL);
+  });
 };

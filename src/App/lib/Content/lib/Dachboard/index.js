@@ -22,9 +22,6 @@ const Dashboard = () => {
           <div className={Css.log}><LogoFull /></div>
           <div className={Css.close} onClick={handleCloseClick} />
         </div>
-        <div className={Css.business}>
-          New business from Xero
-        </div>
       </div>
       <CurrentAccount />
       <Accounts />

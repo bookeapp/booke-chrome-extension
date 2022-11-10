@@ -26,7 +26,9 @@ const Main = () => {
   }, [dispatch, preloaderShown, userData]);
 
   return (
-    <div className={classNames(Css.main, preloaderShown && Css.preloaderShown)} onClick={handleButtonClick}>
+    <div
+      className={classNames(Css.main, preloaderShown && Css.preloaderShown)}
+      onClick={handleButtonClick}>
       <Logo />
     </div>
   );

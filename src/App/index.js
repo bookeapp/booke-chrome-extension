@@ -1,11 +1,10 @@
 import Css from "./style.module.scss";
 
-import { VIEWS } from "const/Constants";
 import { fetchStats, uiSlice, userSlice } from "slices";
 import { log } from "utils";
 import { useDispatch } from "react-redux";
 import Content from "./lib/Content";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import authZeroApi from "api/AuthZeroApi";
 import restApi from "api/RestApi";
 
@@ -32,7 +31,15 @@ const getShortCode = () => {
 const App = () => {
   const dispatch = useDispatch();
 
+  const shortCode = useMemo(() => {
+    return getShortCode();
+  }, []);
+
+  log({ shortCode });
+
   const loadInitialData = useCallback(async() => {
+    if (!shortCode) return;
+
     const token = await authZeroApi.getAuthToken();
 
     log({ token: !!token });
@@ -44,21 +51,18 @@ const App = () => {
 
       dispatch(userSlice.actions.setUserData(user));
 
-      const shortCode = getShortCode();
-
-      log({ shortCode });
-
       if (shortCode) {
         await dispatch(fetchStats(shortCode));
-        dispatch(uiSlice.actions.setCurrentView(VIEWS.DASHBOARD));
       }
     }
     dispatch(uiSlice.actions.togglePreloader(false));
-  }, [dispatch]);
+  }, [dispatch, shortCode]);
 
   useEffect(() => {
     loadInitialData();
   }, [loadInitialData]);
+
+  if (!shortCode) return null;
 
   return (
     <div className={Css.root}>
