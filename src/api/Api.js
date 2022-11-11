@@ -6,6 +6,8 @@ const ACCOUNTS = "/accounts";
 
 const CHECK = "/check";
 
+const RECONCILE = "/reconcile";
+
 class Api extends RestApi {
   fetchStats(code) {
     return this.get(`/${code}${STATS}`);
@@ -13,6 +15,12 @@ class Api extends RestApi {
 
   checkStatements({ accountId, transactions }) {
     return this.post(`${ACCOUNTS}/${accountId}${CHECK}`, null, {
+      transactions: transactions.map(({ id, ...rest }) => btoa(JSON.stringify(rest)))
+    });
+  }
+
+  reconcileStatements({ accountId, transactions }) {
+    return this.post(`${ACCOUNTS}/${accountId}${RECONCILE}`, null, {
       transactions: transactions.map(({ id, ...rest }) => btoa(JSON.stringify(rest)))
     });
   }

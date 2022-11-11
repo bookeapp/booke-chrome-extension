@@ -31,7 +31,7 @@
     "lint": "eslint ./src/**/*.js",
     "watch": "webpack --watch --config webpack.dev.js --mode development",
     "start": "webpack serve --config webpack.dev.js --mode development",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js --mode production"
   },
   "repository": {
     "type": "git",
@@ -47,6 +47,7 @@
     "@auth0/auth0-spa-js": "^2.0.0",
     "@reduxjs/toolkit": "^1.8.6",
     "classnames": "^2.3.2",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5"

@@ -1,5 +1,6 @@
 import Css from "./style.module.scss";
 
+import { LOGO_IMG_DATA_URI } from "const/Constants";
 import { getBusinessesData } from "selectors";
 import { log, normalizeId, waitUntil } from "utils";
 import { useSelector } from "react-redux";
@@ -8,18 +9,50 @@ import Check from "./lib/Check";
 import Preloader from "lib/Preloader";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import api from "api/Api";
+import createElement from "utils/createElement";
+import moment from "moment/moment";
 import useEnvVars from "hooks/useEnvVars";
+
+const PROCENTS = 100;
+
+const MAX_WAITING = 1000;
+
+const clickOnButton = async(items, index, callback) => {
+  if (index < items.length) {
+    const item = items[index];
+
+    if (item) {
+      const { id } = item;
+
+      const statement = document.getElementById(id);
+
+      if (statement) {
+        const button = statement.querySelector(".okayButton");
+
+        if (button) {
+          button.click();
+
+          await waitUntil(() => {
+            return !document.getElementById(id);
+          }, MAX_WAITING);
+        }
+      }
+    }
+    callback(index + 1, items.lenght);
+    clickOnButton(index + 1);
+  }
+};
 
 const CurrentAccount = () => {
   const [{ accountID: accountId }] = useEnvVars();
 
   const businessesData = useSelector(getBusinessesData);
 
-  const [inProgress, setInProgress] = useState(false);
+  const [currentProgress, setCurrentProgress] = useState(null);
 
   const [preloaderShown, setPreloaderShown] = useState(true);
 
-  const [itemsToReconcile, setItemsToReconcile] = useState([]);
+  const [itemsFromBooke, setItemsFromBooke] = useState([]);
 
   const currentBusiness = useMemo(() => {
     return businessesData.find(({ xeroAccountId }) => {
@@ -27,7 +60,7 @@ const CurrentAccount = () => {
     });
   }, [accountId, businessesData]);
 
-  const findItemsToReconcile = useCallback(async() => {
+  const finditemsFromBooke = useCallback(async() => {
     try {
       const statementLinesNode = document.querySelector("#statementLines");
 
@@ -43,7 +76,7 @@ const CurrentAccount = () => {
         return;
       }
 
-      [...nodes].forEach((node) => {
+      /* [...nodes].forEach((node) => {
         const comment = node.querySelector(".statement.comments");
 
         if (comment) {
@@ -51,7 +84,7 @@ const CurrentAccount = () => {
 
           if (tab) tab.click();
         }
-      });
+      }); */
 
       const statementMatchedNodes = [...nodes].map((node) => {
         return node.querySelector(".statement.matched");
@@ -72,49 +105,85 @@ const CurrentAccount = () => {
 
         const [timestampNode, addressNode, descriptionNode] = detailsContainer.querySelectorAll(".details span");
 
-        const [amounNodeSpent, amountNodeReceived] = detailsContainer.querySelector(".amount");
+        const [amounNodeSpent, amountNodeReceived] = detailsContainer.querySelectorAll(".amount");
 
-        const spent = (parseFloat(amounNodeSpent?.textContent || 0));
+        const spent = (parseFloat(amounNodeSpent?.textContent?.replace(/,/g, "") || 0));
 
-        const received = (parseFloat(amountNodeReceived?.textContent || 0));
+        const received = (parseFloat(amountNodeReceived?.textContent?.replace(/,/g, "") || 0));
 
         const amount = spent || received;
+
+        const timestamp = timestampNode?.textContent;
 
         return {
           id: node.id,
           addressName: addressNode?.textContent || undefined,
-          amoun: amount * (spent ? -1 : 1) || undefined,
+          amount: amount * (spent ? -1 : 1) || undefined,
           description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
-          timestamp: timestampNode?.textContent || undefined
+          timestamp: timestamp ? moment.utc(timestampNode?.textContent).toISOString() : undefined
         };
       }).filter(Boolean);
 
       log({ items });
 
-      setItemsToReconcile(items);
+      const response = await api.checkStatements({
+        transactions: items,
+        accountId: currentBusiness.xeroAccountId
+      });
+
+      log({ response });
+
+      if (!response || !response.results || !response.results.length) return;
+
+      const fromBooke = response.results.map((result, index) => {
+        if (!result) return null;
+
+        const item = items[index];
+
+        const node = document.getElementById(item.id);
+
+        if (!node) return null;
+
+        node.querySelector(".ok")?.appendChild(
+          createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
+        );
+
+        return item;
+      }).filter(Boolean);
+
+      setItemsFromBooke(fromBooke);
       setPreloaderShown(false);
     } catch (exeption) {
-      log("ERROR getItemsToReconcile", exeption);
+      log("ERROR getitemsFromBooke", exeption);
       setPreloaderShown(false);
     }
-  }, []);
+  }, [currentBusiness.xeroAccountId]);
 
-  const handleStartClick = useCallback(async() => {
-    setInProgress(true);
+  const handleStartClick = useCallback(() => {
+    setCurrentProgress({ value: 0 });
 
-    const result = await api.checkStatements({
-      transactions: itemsToReconcile,
-      accountId: currentBusiness.xeroAccountId
+    setItemsFromBooke([]);
+
+    clickOnButton(itemsFromBooke, 0, async(current, all) => {
+      const progress = current / all;
+
+      if (progress === 1) {
+        await api.reconcileStatements({
+          accountId: currentBusiness.xeroAccountId,
+          transactions: itemsFromBooke
+        });
+        setCurrentProgress(null);
+      } else {
+        setCurrentProgress({ value: current / all });
+      }
     });
-
-    log({ result });
-  }, [itemsToReconcile, currentBusiness]);
+  }, [currentBusiness.xeroAccountId, itemsFromBooke]);
 
   useEffect(() => {
     if (!accountId) return;
 
-    findItemsToReconcile();
-  }, [accountId, findItemsToReconcile]);
+    finditemsFromBooke();
+  }, [accountId, finditemsFromBooke]);
 
   if (!currentBusiness) return null;
 
@@ -131,21 +200,23 @@ const CurrentAccount = () => {
       {(() => {
         if (preloaderShown) return (<Preloader />);
 
-        if (inProgress) {
+        if (currentProgress) {
+          const procents = `${currentProgress * PROCENTS}%`;
+
           return (
             <div className={Css.progress}>
               <div className={Css.label}>
                 <div>Progress</div>
-                <div>90% (20 sec left)</div>
+                <div>{procents}</div>
               </div>
               <div className={Css.bar}>
-                <div className={Css.fill} style={{ width: "10%" }} />
+                <div className={Css.fill} style={{ width: procents }} />
               </div>
             </div>
           );
         }
 
-        if (itemsToReconcile) {
+        if (itemsFromBooke.length) {
           return (
             <Button
               block
