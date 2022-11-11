@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import restApi from "api/RestApi";
+import api from "api/Api";
 
 export const uiSlice = createSlice({
   name: "ui",
@@ -36,7 +36,7 @@ export const businessesSlice = createSlice({
 });
 
 export const fetchStats = createAsyncThunk("stats/fetch", async(shortCode) => {
-  const response = await restApi.get(`${shortCode}/stats`);
+  const response = await api.fetchStats(shortCode);
 
   return response.results;
 });

@@ -95,6 +95,4 @@ class RestApi {
   }
 }
 
-const restApi = new RestApi(process.env.MAIN_API_URL);
-
-export default restApi;
+export default RestApi;

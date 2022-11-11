@@ -7,6 +7,7 @@ import Button from "lib/Button";
 import Check from "./lib/Check";
 import Preloader from "lib/Preloader";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import api from "api/Api";
 import useEnvVars from "hooks/useEnvVars";
 
 const CurrentAccount = () => {
@@ -28,11 +29,13 @@ const CurrentAccount = () => {
 
   const findItemsToReconcile = useCallback(async() => {
     try {
-      const nodes = document.querySelectorAll("#statementLines [data-statementlineid]");
+      const statementLinesNode = document.querySelector("#statementLines");
 
       await waitUntil(() => {
-        return !nodes.querySelector(".statement.load");
+        return !statementLinesNode.querySelector(".statement.load");
       });
+
+      const nodes = statementLinesNode.querySelectorAll("[data-statementlineid]");
 
       if (!nodes.length) {
         setPreloaderShown(false);
@@ -40,11 +43,7 @@ const CurrentAccount = () => {
         return;
       }
 
-      const statementMatchedNodes = [...nodes].map((node) => {
-        const matched = node.querySelector(".statement.matched");
-
-        if (matched) return matched;
-
+      [...nodes].forEach((node) => {
         const comment = node.querySelector(".statement.comments");
 
         if (comment) {
@@ -52,8 +51,10 @@ const CurrentAccount = () => {
 
           if (tab) tab.click();
         }
+      });
 
-        return null;
+      const statementMatchedNodes = [...nodes].map((node) => {
+        return node.querySelector(".statement.matched");
       }).filter(Boolean);
 
       if (!statementMatchedNodes.length) {
@@ -62,37 +63,52 @@ const CurrentAccount = () => {
         return;
       }
 
-      setTimeout(() => {
-        const items = statementMatchedNodes.map((statementMatched) => {
-          const detailsContainer = statementMatched.querySelector(".details-container");
+      const items = [...nodes].map((node) => {
+        const statementMatched = node.querySelector(".statement.matched");
 
-          if (!detailsContainer) return null;
+        const detailsContainer = statementMatched.querySelector(".details-container");
 
-          const [timestampNode, addressNode, descriptionNode] = detailsContainer.querySelectorAll(".details span");
+        if (!detailsContainer) return null;
 
-          return {
-            id: statementMatched.id,
-            addressName: addressNode?.textContent || "",
-            amoun: detailsContainer.querySelector(".amount.set")?.textContent || "",
-            description: descriptionNode?.textContent || "",
-            timestamp: timestampNode?.textContent || ""
-          };
-        }).filter(Boolean);
+        const [timestampNode, addressNode, descriptionNode] = detailsContainer.querySelectorAll(".details span");
 
-        log({ items });
+        const [amounNodeSpent, amountNodeReceived] = detailsContainer.querySelector(".amount");
 
-        setItemsToReconcile(items);
-        setPreloaderShown(false);
-      }, 0);
+        const spent = (parseFloat(amounNodeSpent?.textContent || 0));
+
+        const received = (parseFloat(amountNodeReceived?.textContent || 0));
+
+        const amount = spent || received;
+
+        return {
+          id: node.id,
+          addressName: addressNode?.textContent || undefined,
+          amoun: amount * (spent ? -1 : 1) || undefined,
+          description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
+          timestamp: timestampNode?.textContent || undefined
+        };
+      }).filter(Boolean);
+
+      log({ items });
+
+      setItemsToReconcile(items);
+      setPreloaderShown(false);
     } catch (exeption) {
       log("ERROR getItemsToReconcile", exeption);
       setPreloaderShown(false);
     }
   }, []);
 
-  const handleStartClick = useCallback(() => {
+  const handleStartClick = useCallback(async() => {
     setInProgress(true);
-  }, []);
+
+    const result = await api.checkStatements({
+      transactions: itemsToReconcile,
+      accountId: currentBusiness.xeroAccountId
+    });
+
+    log({ result });
+  }, [itemsToReconcile, currentBusiness]);
 
   useEffect(() => {
     if (!accountId) return;
@@ -114,16 +130,7 @@ const CurrentAccount = () => {
       </div>
       {(() => {
         if (preloaderShown) return (<Preloader />);
-        if (itemsToReconcile) {
-          return (
-            <Button
-              block
-              theme="success"
-              onClick={handleStartClick}>
-              Reconcile Booke transactions
-            </Button>
-          );
-        }
+
         if (inProgress) {
           return (
             <div className={Css.progress}>
@@ -132,9 +139,20 @@ const CurrentAccount = () => {
                 <div>90% (20 sec left)</div>
               </div>
               <div className={Css.bar}>
-                <div className={Css.fill} style={{ width: "90%" }} />
+                <div className={Css.fill} style={{ width: "10%" }} />
               </div>
             </div>
+          );
+        }
+
+        if (itemsToReconcile) {
+          return (
+            <Button
+              block
+              theme="success"
+              onClick={handleStartClick}>
+              Reconcile Booke transactions
+            </Button>
           );
         }
 

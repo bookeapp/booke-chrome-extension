@@ -5,8 +5,8 @@ import { log } from "utils";
 import { useDispatch } from "react-redux";
 import Content from "./lib/Content";
 import React, { useCallback, useEffect, useMemo } from "react";
+import api from "api/Api";
 import authZeroApi from "api/AuthZeroApi";
-import restApi from "api/RestApi";
 
 const getShortCode = () => {
   try {
@@ -45,7 +45,7 @@ const App = () => {
     log({ token: !!token });
 
     if (token) {
-      restApi.setToken(token);
+      api.setToken(token);
 
       const user = await authZeroApi.getUserInfo();
 
