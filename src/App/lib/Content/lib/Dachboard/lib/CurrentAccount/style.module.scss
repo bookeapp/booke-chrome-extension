@@ -62,6 +62,9 @@
   }
 }
 .buttonLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -76,4 +79,7 @@
   img {
     width: 12px;
   }
+}
+.container {
+  position: relative;
 }

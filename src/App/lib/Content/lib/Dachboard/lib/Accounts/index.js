@@ -17,7 +17,9 @@ const Accounts = () => {
 
   const filteredBusiness = useMemo(() => {
     return businessesData.filter(({ xeroAccountId, transactions }) => {
-      return normalizeId(xeroAccountId) !== accountId && transactions;
+      return xeroAccountId !== accountId
+        && normalizeId(xeroAccountId) !== accountId
+        && transactions;
     });
   }, [accountId, businessesData]);
 

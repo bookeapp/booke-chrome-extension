@@ -10,37 +10,20 @@ import Preloader from "lib/Preloader";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import api from "api/Api";
 import createElement from "utils/createElement";
-import moment from "moment/moment";
 import useEnvVars from "hooks/useEnvVars";
 
 const PROCENTS = 100;
 
-const MAX_WAITING = 1000;
+const parseTime = (text) => {
+  try {
+    const date = new Date(text);
 
-const clickOnButton = async(items, index, callback) => {
-  if (index < items.length) {
-    const item = items[index];
+    date.setMinutes(-date.getTimezoneOffset());
 
-    if (item) {
-      const { id } = item;
+    return date.toISOString();
+  } catch (exeption) {}
 
-      const statement = document.getElementById(id);
-
-      if (statement) {
-        const button = statement.querySelector(".okayButton");
-
-        if (button) {
-          button.click();
-
-          await waitUntil(() => {
-            return !document.getElementById(id);
-          }, MAX_WAITING);
-        }
-      }
-    }
-    callback(index + 1, items.lenght);
-    clickOnButton(index + 1);
-  }
+  return undefined;
 };
 
 const CurrentAccount = () => {
@@ -70,12 +53,6 @@ const CurrentAccount = () => {
 
       const nodes = statementLinesNode.querySelectorAll("[data-statementlineid]");
 
-      if (!nodes.length) {
-        setPreloaderShown(false);
-
-        return;
-      }
-
       /* [...nodes].forEach((node) => {
         const comment = node.querySelector(".statement.comments");
 
@@ -86,20 +63,8 @@ const CurrentAccount = () => {
         }
       }); */
 
-      const statementMatchedNodes = [...nodes].map((node) => {
-        return node.querySelector(".statement.matched");
-      }).filter(Boolean);
-
-      if (!statementMatchedNodes.length) {
-        setPreloaderShown(false);
-
-        return;
-      }
-
       const items = [...nodes].map((node) => {
-        const statementMatched = node.querySelector(".statement.matched");
-
-        const detailsContainer = statementMatched.querySelector(".details-container");
+        const detailsContainer = node.querySelector(".statement.matched .details-container");
 
         if (!detailsContainer) return null;
 
@@ -113,18 +78,22 @@ const CurrentAccount = () => {
 
         const amount = spent || received;
 
-        const timestamp = timestampNode?.textContent;
-
         return {
           id: node.id,
           addressName: addressNode?.textContent || undefined,
           amount: amount * (spent ? -1 : 1) || undefined,
           description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
-          timestamp: timestamp ? moment.utc(timestampNode?.textContent).toISOString() : undefined
+          timestamp: parseTime(timestampNode?.textContent)
         };
       }).filter(Boolean);
 
       log({ items });
+
+      if (!items.length) {
+        setPreloaderShown(false);
+
+        return;
+      }
 
       const response = await api.checkStatements({
         transactions: items,
@@ -144,7 +113,13 @@ const CurrentAccount = () => {
 
         if (!node) return null;
 
-        node.querySelector(".ok")?.appendChild(
+        const container = node.querySelector(".info");
+
+        if (!container) return null;
+
+        container.classList.add(Css.container);
+
+        container.appendChild(
           createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
         );
 
@@ -157,27 +132,34 @@ const CurrentAccount = () => {
       log("ERROR getitemsFromBooke", exeption);
       setPreloaderShown(false);
     }
-  }, [currentBusiness.xeroAccountId]);
+  }, [currentBusiness]);
 
   const handleStartClick = useCallback(() => {
     setCurrentProgress({ value: 0 });
 
-    setItemsFromBooke([]);
+    itemsFromBooke.forEach(async(item, index) => {
+      const { id } = item;
 
-    clickOnButton(itemsFromBooke, 0, async(current, all) => {
-      const progress = current / all;
+      const statement = document.getElementById(id);
 
-      if (progress === 1) {
-        await api.reconcileStatements({
-          accountId: currentBusiness.xeroAccountId,
-          transactions: itemsFromBooke
-        });
-        setCurrentProgress(null);
-      } else {
-        setCurrentProgress({ value: current / all });
+      if (statement) {
+        const button = statement.querySelector(".okayButton");
+
+        if (button) {
+          button.removeAttribute("href");
+          await waitUntil(() => false, 500 * index); // eslint-disable-line no-magic-numbers
+          button.click();
+          setCurrentProgress({ value: itemsFromBooke.length / (index + 1) });
+        }
       }
     });
-  }, [currentBusiness.xeroAccountId, itemsFromBooke]);
+
+    setItemsFromBooke([]);
+    /* TODO await api.reconcileStatements({
+      accountId: currentBusiness.xeroAccountId,
+      transactions: itemsFromBooke
+    });  */
+  }, [itemsFromBooke]);
 
   useEffect(() => {
     if (!accountId) return;
@@ -201,7 +183,7 @@ const CurrentAccount = () => {
         if (preloaderShown) return (<Preloader />);
 
         if (currentProgress) {
-          const procents = `${currentProgress * PROCENTS}%`;
+          const procents = `${currentProgress.value * PROCENTS}%`;
 
           return (
             <div className={Css.progress}>
@@ -227,12 +209,16 @@ const CurrentAccount = () => {
           );
         }
 
-        return (
-          <div className={Css.message}>
-            <div className={Css.icon}><Check /></div>
-            <div className={Css.text}>On the <b>Stripe Bank Account</b>, all transactions have been successfully reconciled</div>
-          </div>
-        );
+        if (!transactions) {
+          return (
+            <div className={Css.message}>
+              <div className={Css.icon}><Check /></div>
+              <div className={Css.text}>On the <b>{businessName}</b>, all transactions have been successfully reconciled</div>
+            </div>
+          );
+        }
+
+        return null;
       })()}
     </div>
   );
