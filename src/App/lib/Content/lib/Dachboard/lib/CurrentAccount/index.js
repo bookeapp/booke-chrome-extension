@@ -113,15 +113,15 @@ const CurrentAccount = () => {
 
         if (!node) return null;
 
-        const container = node.querySelector(".info");
+        const container = node.querySelector(".statement.matched .info.c0");
 
-        if (!container) return null;
+        if (container) {
+          container.classList.add(Css.container);
 
-        container.classList.add(Css.container);
-
-        container.appendChild(
-          createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
-        );
+          container.appendChild(
+            createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
+          );
+        }
 
         return item;
       }).filter(Boolean);
@@ -147,19 +147,30 @@ const CurrentAccount = () => {
 
         if (button) {
           button.removeAttribute("href");
-          await waitUntil(() => false, 500 * index); // eslint-disable-line no-magic-numbers
+          await waitUntil(() => false, 100 * index); // eslint-disable-line no-magic-numbers
           button.click();
           setCurrentProgress({ value: itemsFromBooke.length / (index + 1) });
+          if (!itemsFromBooke.length - index - 1) {
+            setItemsFromBooke([]);
+            await api.reconcileStatements({
+              accountId: currentBusiness.xeroAccountId,
+              transactions: itemsFromBooke
+            });
+            setCurrentProgress(null);
+            setPreloaderShown(true);
+            await waitUntil(() => false, 5000); // eslint-disable-line no-magic-numbers
+            finditemsFromBooke();
+          }
         }
       }
     });
+  }, [currentBusiness, itemsFromBooke, finditemsFromBooke]);
 
-    setItemsFromBooke([]);
-    /* TODO await api.reconcileStatements({
-      accountId: currentBusiness.xeroAccountId,
-      transactions: itemsFromBooke
-    });  */
-  }, [itemsFromBooke]);
+  const handleFindTransactions = useCallback(async() => {
+    setPreloaderShown(true);
+    await waitUntil(() => false, 1000); // eslint-disable-line no-magic-numbers
+    finditemsFromBooke();
+  }, [finditemsFromBooke]);
 
   useEffect(() => {
     if (!accountId) return;
@@ -218,7 +229,11 @@ const CurrentAccount = () => {
           );
         }
 
-        return null;
+        return (
+          <Button block onClick={handleFindTransactions}>
+            Find Booke transactions
+          </Button>
+        );
       })()}
     </div>
   );
