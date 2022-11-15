@@ -1,6 +1,6 @@
 import Css from "./style.module.scss";
 
-import { BOTTOM_INDENT, VIEWS, XERO_HEADER_HEIGHT } from "const/Constants";
+import { BOTTOM_INDENT, TOP_INDENT, VIEWS } from "const/Constants";
 import { getPositionY, getPreloaderState, getUserData } from "selectors";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,7 +43,7 @@ const Main = () => {
     setPositionY(
       Math.min(
         window.innerHeight - BOTTOM_INDENT,
-        Math.max(position, XERO_HEADER_HEIGHT)
+        Math.max(position, TOP_INDENT)
       )
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,7 +62,7 @@ const Main = () => {
       dispatch(uiSlice.actions.setPositionY(
         Math.min(
           window.innerHeight - BOTTOM_INDENT,
-          Math.max(position, XERO_HEADER_HEIGHT)
+          Math.max(position, TOP_INDENT)
         )
       ));
     }

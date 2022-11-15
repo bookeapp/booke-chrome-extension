@@ -7,9 +7,11 @@ const DEFAULT_INDENT = 16;
 
 const MAIN_VIEW_HEIGHT = 60;
 
+const XERO_HEADER_HEIGHT = 170;
+
 export const STORAGE_NAME = "booke_ai_extension";
 
-export const XERO_HEADER_HEIGHT = 170;
+export const TOP_INDENT = XERO_HEADER_HEIGHT + DEFAULT_INDENT;
 
 export const BOTTOM_INDENT = MAIN_VIEW_HEIGHT + DEFAULT_INDENT;
 
