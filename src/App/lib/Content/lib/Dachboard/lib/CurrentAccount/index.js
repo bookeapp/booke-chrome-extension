@@ -5,7 +5,7 @@ import { getBusinessesData } from "selectors";
 import { log, normalizeId, waitUntil } from "utils";
 import { useSelector } from "react-redux";
 import Button from "lib/Button";
-import Check from "./lib/Check";
+import IconCheck from "lib/IconCheck";
 import Preloader from "lib/Preloader";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import api from "api/Api";
@@ -229,7 +229,7 @@ const CurrentAccount = () => {
         if (!transactions) {
           return (
             <div className={Css.message}>
-              <div className={Css.icon}><Check /></div>
+              <div className={Css.icon}><IconCheck /></div>
               <div className={Css.text}>On the <b>{businessName}</b>, all transactions have been successfully reconciled</div>
             </div>
           );

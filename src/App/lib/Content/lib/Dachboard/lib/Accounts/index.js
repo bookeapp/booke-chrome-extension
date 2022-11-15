@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import Badge from "lib/Badge";
 import Button from "lib/Button";
 import IconArrowRight from "./lib/IconArrowRight";
+import IconCheck from "lib/IconCheck";
 import React, { useMemo } from "react";
 import Table, { TableCell, TableHead, TableRow } from "lib/Table";
 import useEnvVars from "hooks/useEnvVars";
@@ -28,7 +29,8 @@ const Accounts = () => {
 
     return (
       <div className={Css.emptyState}>
-        Well done! You have no transactions to reconcile
+        <div className={Css.icon}><IconCheck /></div>
+        <div>Well done! You have no transactions to reconcile</div>
       </div>
     );
   }

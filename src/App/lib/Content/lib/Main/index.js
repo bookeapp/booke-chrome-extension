@@ -6,11 +6,13 @@ import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
 import AuthZeroApi from "api/AuthZeroApi";
 import Logo from "./lib/Logo";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
 const Main = () => {
   const dispatch = useDispatch();
+
+  const preventClickRef = useRef();
 
   const preloaderShown = useSelector(getPreloaderState);
 
@@ -25,6 +27,11 @@ const Main = () => {
   const dragged = !!dragStart;
 
   const handleButtonClick = useCallback(() => {
+    if (preventClickRef.current) {
+      preventClickRef.current = false;
+
+      return;
+    }
     if (preloaderShown) return;
     if (userData) {
       dispatch(uiSlice.actions.setCurrentView(VIEWS.DASHBOARD));
@@ -55,8 +62,10 @@ const Main = () => {
     const draggedDistantion = event.clientY - dragStart;
 
     if (draggedDistantion === 0) {
-      handleButtonClick();
+      preventClickRef.current = false;
     } else {
+      preventClickRef.current = true;
+
       const position = positionY + draggedDistantion;
 
       dispatch(uiSlice.actions.setPositionY(
@@ -87,7 +96,8 @@ const Main = () => {
     <div
       className={classNames(Css.main, preloaderShown && Css.preloaderShown)}
       style={{ top: positionY ? `${positionY}px` : "50%" }}
-      onMouseDown={handleMouseDown}>
+      onMouseDown={handleMouseDown}
+      onClick={handleButtonClick}>
       <Logo />
     </div>
   );

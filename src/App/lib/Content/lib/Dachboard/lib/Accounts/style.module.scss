@@ -1,7 +1,7 @@
 @import "config";
 
 .accounts {
-  padding: $contentDefaultIndent * 2;  
+  padding: $contentDefaultIndent * 2;
   .title {
     font-weight: 500;
     font-size: 14px;
@@ -15,7 +15,7 @@
     }
     .toReconcileCell {
       width: 64px;
-      flex: 64;  
+      flex: 64;
       justify-content: center;
       .badge {
         width: 34px;
@@ -23,8 +23,8 @@
     }
     .actionCell {
       width: 62px;
-      flex: 62;     
-      padding-right: 0;   
+      flex: 62;
+      padding-right: 0;
       a {
         color: inherit;
         text-decoration: none;
@@ -36,7 +36,7 @@
           margin-left: 0.3em;
         }
       }
-    } 
+    }
   }
 }
 .emptyState {
@@ -45,6 +45,22 @@
   text-align: center;
   color: $uiMediumDarkColor;
   max-width: 180px;
-  padding: $contentDefaultIndent * 3 $contentDefaultIndent * 2;
+  padding: $contentDefaultIndent * 2;
   margin: auto;
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: $uiWhiteColor;
+    width: 32px;
+    height: 32px;
+    margin-bottom: $contentDefaultIndent;
+    border-radius: 50%;
+    background-color: $uiPositiveColor;
+    box-shadow: 0 0 0 4px rgba($uiPositiveColor, 0.2);
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
 }
