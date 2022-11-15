@@ -134,18 +134,23 @@ export const setStoreData = (data) => {
 
 const DEFAULT_MAX_WAITING_TIME = 60000;
 
-const INTERVAL = 10;
+const INTERVAL = 50;
 
 export const waitUntil = (condition, maxTime = DEFAULT_MAX_WAITING_TIME) => {
   const start = Date.now();
 
   return new Promise((resolve) => {
     const inervalId = setInterval(() => {
-      const result = condition();
+      try {
+        const result = condition();
 
-      if (result || (Date.now() - start) > maxTime) {
+        if (result || (Date.now() - start) > maxTime) {
+          clearInterval(inervalId);
+          resolve(result);
+        }
+      } catch (exception) {
         clearInterval(inervalId);
-        resolve(result);
+        resolve(false);
       }
     }, INTERVAL);
   });

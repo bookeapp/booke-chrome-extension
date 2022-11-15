@@ -47,6 +47,12 @@ const CurrentAccount = () => {
     try {
       const statementLinesNode = document.querySelector("#statementLines");
 
+      if (!statementLinesNode) {
+        setPreloaderShown(false);
+
+        return;
+      }
+
       await waitUntil(() => {
         return !statementLinesNode.querySelector(".statement.load");
       });
