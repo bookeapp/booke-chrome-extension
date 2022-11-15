@@ -1,4 +1,4 @@
-import { VIEWS } from "const/Constants";
+import { INITIAL_POSITION_Y, VIEWS } from "const/Constants";
 import {
   businessesSlice,
   statsSlice,
@@ -19,8 +19,10 @@ const localStorageMiddleware = (store) => (next) => (action) => {
 
   if (type === uiSlice.actions.setCurrentView.type) {
     setStoreData({ currentView: payload });
+  }
 
-    next(action);
+  if (type === uiSlice.actions.setPositionY.type) {
+    setStoreData({ positionY: payload });
   }
 
   return next(action);
@@ -40,7 +42,8 @@ export default configureStore({
   preloadedState: {
     ui: {
       preloaderShown: true,
-      currentView: storedData.currentView || VIEWS.DASHBOARD
+      currentView: storedData.currentView || VIEWS.DASHBOARD,
+      positionY: storedData.currentY || INITIAL_POSITION_Y
     },
     texts: defaultTexts,
     businesses: {

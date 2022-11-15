@@ -6,7 +6,8 @@ export const uiSlice = createSlice({
   initialState: {},
   reducers: {
     togglePreloader: (state, { payload }) => ({ ...state, preloaderShown: payload }),
-    setCurrentView: (state, { payload }) => ({ ...state, currentView: payload })
+    setCurrentView: (state, { payload }) => ({ ...state, currentView: payload }),
+    setPositionY: (state, { payload }) => ({ ...state, positionY: payload })
   }
 });
 

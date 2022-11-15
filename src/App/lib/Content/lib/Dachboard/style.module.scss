@@ -1,9 +1,11 @@
 @import "config";
 
 .dashboard {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: fixed;
+  z-index: 3;
+  right: 15px;
+  top: 50%;
+  top: calc(50% - 30px);
   width: 356px;
   background: $uiWhiteColor;
   border: 1px solid $uiBorderColor;
@@ -15,12 +17,12 @@
     .top {
       display: flex;
       align-items: center;
-      justify-content: space-between;     
+      justify-content: space-between;
       .logo {
         svg {
           display: block;
         }
-      }     
+      }
       .close {
         display: flex;
         align-items: center;
@@ -40,7 +42,7 @@
           content: "";
         }
       }
-    }      
+    }
     .business {
       font-size: 12px;
       line-height: 14px;

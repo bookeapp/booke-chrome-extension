@@ -1,12 +1,14 @@
 @import "config";
 
 .main {
-  position: relative;
+  position: fixed;
+  z-index: 3;
+  right: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  width: 60px;
+  height: 60px;
   cursor: pointer;
   box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
   border-radius: 50%;
@@ -15,11 +17,11 @@
   svg {
     width: 27px;
   }
-  &:hover {      
+  &:hover {
     box-shadow: 0 5px 20px rgba(158, 162, 171, 0.3);
   }
   &.preloaderShown {
-    cursor: default;    
+    cursor: default;
     svg {
       opacity: 0.5;
     }
@@ -42,7 +44,7 @@
     opacity: 0;
     transform: rotate(0);
   }
-  50% {    
+  50% {
     opacity: 1;
     transform: rotate(2turn);
   }
