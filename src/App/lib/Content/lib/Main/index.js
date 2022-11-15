@@ -1,6 +1,6 @@
 import Css from "./style.module.scss";
 
-import { VIEWS } from "const/Constants";
+import { BOTTOM_INDENT, VIEWS, XERO_HEADER_HEIGHT } from "const/Constants";
 import { getPositionY, getPreloaderState, getUserData } from "selectors";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,8 +15,6 @@ const Main = () => {
   const preloaderShown = useSelector(getPreloaderState);
 
   const initialPositionY = useSelector(getPositionY);
-
-  console.log(">>> ", { initialPositionY });
 
   const userData = useSelector(getUserData);
 
@@ -40,17 +38,35 @@ const Main = () => {
   }, []);
 
   const handleWindowMouseMove = useCallback((event) => {
-    setPositionY(positionY + event.clientY - dragStart);
+    const position = positionY + event.clientY - dragStart;
+
+    setPositionY(
+      Math.min(
+        window.innerHeight - BOTTOM_INDENT,
+        Math.max(position, XERO_HEADER_HEIGHT)
+      )
+    );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragStart]);
 
   const handleWindowMouseUp = useCallback((event) => {
     setDragStart(false);
-    if ((event.clientY - dragStart) === 0) {
+
+    const draggedDistantion = event.clientY - dragStart;
+
+    if (draggedDistantion === 0) {
       handleButtonClick();
     } else {
-      dispatch(uiSlice.actions.setPositionY(event.clientY - dragStart));
+      const position = positionY + draggedDistantion;
+
+      dispatch(uiSlice.actions.setPositionY(
+        Math.min(
+          window.innerHeight - BOTTOM_INDENT,
+          Math.max(position, XERO_HEADER_HEIGHT)
+        )
+      ));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragStart, dispatch, handleButtonClick]);
 
   useEffect(() => {

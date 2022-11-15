@@ -1,4 +1,4 @@
-import { INITIAL_POSITION_Y, VIEWS } from "const/Constants";
+import { VIEWS, XERO_HEADER_HEIGHT } from "const/Constants";
 import {
   businessesSlice,
   statsSlice,
@@ -43,7 +43,8 @@ export default configureStore({
     ui: {
       preloaderShown: true,
       currentView: storedData.currentView || VIEWS.DASHBOARD,
-      positionY: storedData.currentY || INITIAL_POSITION_Y
+      // eslint-disable-next-line no-magic-numbers
+      positionY: storedData.positionY || (((window.innerHeight - XERO_HEADER_HEIGHT) / 2) + XERO_HEADER_HEIGHT)
     },
     texts: defaultTexts,
     businesses: {
