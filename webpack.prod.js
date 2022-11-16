@@ -3,11 +3,11 @@ const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
 
-module.exports = () => {  
+module.exports = () => {
   return {
     entry: "./src/index.js",
     output: {
-      path: path.resolve(__dirname, "build"),
+      path: path.resolve(__dirname, "build." + Date.now().toString(36)),
       filename: "content.js",
     },
     resolve: {
@@ -45,7 +45,7 @@ module.exports = () => {
         },
         {
           test: /\.scss$/i,
-          exclude: /node_modules/,          
+          exclude: /node_modules/,
           use: [
             MiniCssExtractPlugin.loader,
             {
@@ -54,12 +54,12 @@ module.exports = () => {
                 modules: true,
               },
             },
-            { 
+            {
               loader: "sass-loader",
-            },         
+            },
           ],
         },
       ]
-    }  
+    }
   };
 }
