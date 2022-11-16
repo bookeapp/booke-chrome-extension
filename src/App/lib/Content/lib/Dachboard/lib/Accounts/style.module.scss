@@ -7,13 +7,20 @@
       width: 147px;
       flex: 147;
       padding-left: 0;
+      .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
     .toReconcileCell {
       width: 64px;
       flex: 64;
       justify-content: center;
       .badge {
-        width: 34px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 34px;
       }
     }
     .actionCell {

@@ -45,7 +45,9 @@ const Accounts = () => {
         </TableRow>
         {filteredBusiness.map(({ xeroAccountId, name, transactions }) => (
           <TableRow key={xeroAccountId}>
-            <TableCell className={Css.nameCell}>{name}</TableCell>
+            <TableCell className={Css.nameCell}>
+              <div className={Css.name} title={name}>{name}</div>
+            </TableCell>
             <TableCell className={Css.toReconcileCell}>
               <Badge className={Css.badge}>{transactions}</Badge>
             </TableCell>
