@@ -253,7 +253,7 @@ const CurrentAccount = () => {
         }
 
         return (
-          <div className={Css.emptyState}>Has no statements from Booke.ai on this page.</div>
+          <div className={Css.emptyState}>Has no Booke.ai statements on this page</div>
         );
       })()}
     </div>
