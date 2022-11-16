@@ -4,7 +4,6 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  font-size: 13px;
   font-weight: 500;
   height: 32px;
   padding: 0 $contentDefaultIndent * 1.5;
@@ -30,8 +29,8 @@
     width: 100%;
   }
   &.small {
-    height: 24px;   
-    font-size: 11px; 
+    height: 24px;
+    font-size: 12px;
   }
   &.success {
     font-weight: 500;
