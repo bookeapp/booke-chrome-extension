@@ -1,12 +1,11 @@
 import Css from "./style.module.scss";
 
-import { API_CHECK_INTERVAL, FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS } from "const/Constants";
+import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS } from "const/Constants";
 import { getBusinessesData } from "selectors";
 import { log, normalizeId, waitUntil } from "utils";
 import { useSelector } from "react-redux";
 import Button from "lib/Button";
 import IconCheck from "lib/IconCheck";
-import Preloader from "lib/Preloader";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import api from "api/Api";
 import createElement from "utils/createElement";
@@ -32,8 +31,6 @@ const CurrentAccount = () => {
   const [matchedTransactionsIdsHash, setMatchedTransactionsIdsHash] = useState("");
 
   const [currentProgress, setCurrentProgress] = useState(null);
-
-  const [preloaderShown, setPreloaderShown] = useState(false);
 
   const [itemsFromBooke, setItemsFromBooke] = useState([]);
 
@@ -94,8 +91,6 @@ const CurrentAccount = () => {
 
       if (!items.length) return;
 
-      setPreloaderShown(true);
-
       const response = await api.checkStatements({
         transactions: items,
         accountId: currentBusiness.xeroAccountId
@@ -126,10 +121,8 @@ const CurrentAccount = () => {
       }).filter(Boolean);
 
       setItemsFromBooke(fromBooke);
-      setPreloaderShown(false);
     } catch (exception) {
       log("ERROR getitemsFromBooke", exception);
-      setPreloaderShown(false);
     }
   }, [currentBusiness]);
 
@@ -158,19 +151,7 @@ const CurrentAccount = () => {
 
     if (!ids.length) return;
 
-    let timeoutId;
-
-    const check = () => {
-      checkTransactions(ids);
-      timeoutId = setTimeout(() => {
-        check();
-      }, (API_CHECK_INTERVAL));
-    };
-
-    check();
-
-    // eslint-disable-next-line consistent-return
-    return () => clearTimeout(timeoutId);
+    checkTransactions(ids);
   }, [matchedTransactionsIdsHash, checkTransactions]);
 
   const handleStartClick = useCallback(() => {
@@ -194,7 +175,6 @@ const CurrentAccount = () => {
               transactions: itemsFromBooke
             });
             setCurrentProgress(null);
-            setPreloaderShown(true);
           }
         }
       }
@@ -214,8 +194,6 @@ const CurrentAccount = () => {
         )}
       </div>
       {(() => {
-        if (preloaderShown) return (<Preloader />);
-
         if (currentProgress) {
           const procents = `${currentProgress.value * PROCENTS}%`;
 

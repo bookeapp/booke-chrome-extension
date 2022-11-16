@@ -1,5 +1,6 @@
 import Css from "./style.module.scss";
 
+import { API_CHECK_INTERVAL } from "const/Constants";
 import { fetchStats, uiSlice, userSlice } from "slices";
 import { log } from "utils";
 import { useDispatch } from "react-redux";
@@ -31,9 +32,7 @@ const getShortCode = () => {
 const App = () => {
   const dispatch = useDispatch();
 
-  const shortCode = useMemo(() => {
-    return getShortCode();
-  }, []);
+  const shortCode = useMemo(() => getShortCode(), []);
 
   log({ shortCode });
 
@@ -53,6 +52,10 @@ const App = () => {
 
       if (shortCode) {
         await dispatch(fetchStats(shortCode));
+
+        setInterval(() => {
+          dispatch(fetchStats(shortCode));
+        }, [API_CHECK_INTERVAL]);
       }
     }
     dispatch(uiSlice.actions.togglePreloader(false));
