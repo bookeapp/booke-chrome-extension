@@ -32,16 +32,16 @@
         top: 0;
         left: 0;
         height: 100%;
-        border-radius: 4px;   
-        background-color: $uiPrimaryColor;     
+        border-radius: 4px;
+        background-color: $uiPrimaryColor;
       }
     }
   }
   .message {
     display: flex;
     align-items: center;
-    padding: $contentDefaultIndent * 2;  
-    border-radius: $uiBorderRadius;  
+    padding: $contentDefaultIndent * 2;
+    border-radius: $uiBorderRadius;
     background-color: rgba($uiPositiveColor, 0.1);
     .icon {
       display: flex;
@@ -57,9 +57,18 @@
     }
     .text {
       flex: auto;
-      margin-left: $contentDefaultIndent * 2;  
+      margin-left: $contentDefaultIndent * 2;
     }
   }
+}
+.emptyState {
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  color: $uiMediumDarkColor;
+  max-width: 180px;
+  padding: $contentDefaultIndent * 2;
+  margin: auto;
 }
 .buttonLogo {
   display: flex;

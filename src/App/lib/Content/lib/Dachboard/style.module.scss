@@ -5,12 +5,16 @@
   z-index: 3;
   right: 15px;
   top: 50%;
-  top: calc(50% - 30px);
+  top: 15px;
   width: 356px;
   background: $uiWhiteColor;
   border: 1px solid $uiBorderColor;
   box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
   border-radius: $uiBorderRadius;
+  animation: slideFromRight 0.3s;
+  &.slideToRight {
+    animation: slideToRight 0.3s;
+  }
   .header {
     padding: $contentDefaultIndent * 2;
     border-bottom: 1px solid $uiBorderColor;
@@ -48,5 +52,17 @@
       line-height: 14px;
       margin-top: $contentDefaultIndent * 2;
     }
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    transform: translate(110%, 0);
+  }
+}
+
+@keyframes slideToRight {
+  to {
+    transform: translate(110%, 0);
   }
 }

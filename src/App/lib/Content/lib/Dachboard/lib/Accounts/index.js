@@ -37,7 +37,6 @@ const Accounts = () => {
 
   return (
     <div className={Css.accounts}>
-      <div className={Css.title}>Accounts</div>
       <Table className={Css.table}>
         <TableRow>
           <TableHead className={Css.nameCell}>Account</TableHead>

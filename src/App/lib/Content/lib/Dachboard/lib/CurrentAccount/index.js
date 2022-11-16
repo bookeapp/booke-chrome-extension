@@ -1,6 +1,6 @@
 import Css from "./style.module.scss";
 
-import { LOGO_IMG_DATA_URI } from "const/Constants";
+import { API_CHECK_INTERVAL, FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS } from "const/Constants";
 import { getBusinessesData } from "selectors";
 import { log, normalizeId, waitUntil } from "utils";
 import { useSelector } from "react-redux";
@@ -12,8 +12,6 @@ import api from "api/Api";
 import createElement from "utils/createElement";
 import useEnvVars from "hooks/useEnvVars";
 
-const PROCENTS = 100;
-
 const parseTime = (text) => {
   try {
     const date = new Date(text);
@@ -21,7 +19,7 @@ const parseTime = (text) => {
     date.setMinutes(-date.getTimezoneOffset());
 
     return date.toISOString();
-  } catch (exeption) {}
+  } catch (exception) {}
 
   return undefined;
 };
@@ -31,11 +29,15 @@ const CurrentAccount = () => {
 
   const businessesData = useSelector(getBusinessesData);
 
+  const [matchedTransactionsIdsHash, setMatchedTransactionsIdsHash] = useState("");
+
   const [currentProgress, setCurrentProgress] = useState(null);
 
-  const [preloaderShown, setPreloaderShown] = useState(true);
+  const [preloaderShown, setPreloaderShown] = useState(false);
 
   const [itemsFromBooke, setItemsFromBooke] = useState([]);
+
+  const inProgress = !!currentProgress;
 
   const currentBusiness = useMemo(() => {
     return businessesData.find(({ xeroAccountId }) => {
@@ -43,15 +45,11 @@ const CurrentAccount = () => {
     });
   }, [accountId, businessesData]);
 
-  const finditemsFromBooke = useCallback(async() => {
+  const findMatchedTransactions = useCallback(async() => {
     try {
       const statementLinesNode = document.querySelector("#statementLines");
 
-      if (!statementLinesNode) {
-        setPreloaderShown(false);
-
-        return;
-      }
+      if (!statementLinesNode) return;
 
       await waitUntil(() => {
         return !statementLinesNode.querySelector(".statement.load");
@@ -59,17 +57,19 @@ const CurrentAccount = () => {
 
       const nodes = statementLinesNode.querySelectorAll("[data-statementlineid]");
 
-      /* [...nodes].forEach((node) => {
-        const comment = node.querySelector(".statement.comments");
+      if (!nodes.length) return;
 
-        if (comment) {
-          const tab = comment.querySelector(".tabs .t1");
+      setMatchedTransactionsIdsHash(JSON.stringify([...nodes].map((node) => node.id).sort()));
+    } catch (exception) {}
+  }, []);
 
-          if (tab) tab.click();
-        }
-      }); */
+  const checkTransactions = useCallback(async(ids) => {
+    try {
+      const items = ids.map((id) => {
+        const node = document.getElementById(id);
 
-      const items = [...nodes].map((node) => {
+        if (!node) return null;
+
         const detailsContainer = node.querySelector(".statement.matched .details-container");
 
         if (!detailsContainer) return null;
@@ -85,7 +85,6 @@ const CurrentAccount = () => {
         const amount = spent || received;
 
         return {
-          id: node.id,
           addressName: addressNode?.textContent || undefined,
           amount: amount * (spent ? -1 : 1) || undefined,
           description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
@@ -93,13 +92,9 @@ const CurrentAccount = () => {
         };
       }).filter(Boolean);
 
-      log({ items });
+      if (!items.length) return;
 
-      if (!items.length) {
-        setPreloaderShown(false);
-
-        return;
-      }
+      setPreloaderShown(true);
 
       const response = await api.checkStatements({
         transactions: items,
@@ -113,9 +108,7 @@ const CurrentAccount = () => {
       const fromBooke = response.results.map((result, index) => {
         if (!result) return null;
 
-        const item = items[index];
-
-        const node = document.getElementById(item.id);
+        const node = document.getElementById(ids[index]);
 
         if (!node) return null;
 
@@ -129,23 +122,61 @@ const CurrentAccount = () => {
           );
         }
 
-        return item;
+        return ids[index];
       }).filter(Boolean);
 
       setItemsFromBooke(fromBooke);
       setPreloaderShown(false);
-    } catch (exeption) {
-      log("ERROR getitemsFromBooke", exeption);
+    } catch (exception) {
+      log("ERROR getitemsFromBooke", exception);
       setPreloaderShown(false);
     }
   }, [currentBusiness]);
 
+  useEffect(() => {
+    if (!currentBusiness || inProgress) return;
+
+    let timeoutId;
+
+    const find = () => {
+      findMatchedTransactions();
+      timeoutId = setTimeout(() => {
+        find();
+      }, (FIND_MATCHES_INTERVAL));
+    };
+
+    find();
+
+    // eslint-disable-next-line consistent-return
+    return () => clearTimeout(timeoutId);
+  }, [inProgress, currentBusiness, findMatchedTransactions]);
+
+  useEffect(() => {
+    if (!matchedTransactionsIdsHash) return;
+
+    const ids = JSON.parse(matchedTransactionsIdsHash);
+
+    if (!ids.length) return;
+
+    let timeoutId;
+
+    const check = () => {
+      checkTransactions(ids);
+      timeoutId = setTimeout(() => {
+        check();
+      }, (API_CHECK_INTERVAL));
+    };
+
+    check();
+
+    // eslint-disable-next-line consistent-return
+    return () => clearTimeout(timeoutId);
+  }, [matchedTransactionsIdsHash, checkTransactions]);
+
   const handleStartClick = useCallback(() => {
     setCurrentProgress({ value: 0 });
 
-    itemsFromBooke.forEach(async(item, index) => {
-      const { id } = item;
-
+    itemsFromBooke.forEach(async(id, index) => {
       const statement = document.getElementById(id);
 
       if (statement) {
@@ -153,7 +184,7 @@ const CurrentAccount = () => {
 
         if (button) {
           button.removeAttribute("href");
-          await waitUntil(() => false, 100 * index); // eslint-disable-line no-magic-numbers
+          await waitUntil(() => false, 500 * index); // eslint-disable-line no-magic-numbers
           button.click();
           setCurrentProgress({ value: itemsFromBooke.length / (index + 1) });
           if (!itemsFromBooke.length - index - 1) {
@@ -164,25 +195,11 @@ const CurrentAccount = () => {
             });
             setCurrentProgress(null);
             setPreloaderShown(true);
-            await waitUntil(() => false, 5000); // eslint-disable-line no-magic-numbers
-            finditemsFromBooke();
           }
         }
       }
     });
-  }, [currentBusiness, itemsFromBooke, finditemsFromBooke]);
-
-  const handleFindTransactions = useCallback(async() => {
-    setPreloaderShown(true);
-    await waitUntil(() => false, 1000); // eslint-disable-line no-magic-numbers
-    finditemsFromBooke();
-  }, [finditemsFromBooke]);
-
-  useEffect(() => {
-    if (!accountId) return;
-
-    finditemsFromBooke();
-  }, [accountId, finditemsFromBooke]);
+  }, [currentBusiness, itemsFromBooke]);
 
   if (!currentBusiness) return null;
 
@@ -236,9 +253,7 @@ const CurrentAccount = () => {
         }
 
         return (
-          <Button block onClick={handleFindTransactions}>
-            Find Booke transactions
-          </Button>
+          <div className={Css.emptyState}>Has no statements from Booke.ai on this page.</div>
         );
       })()}
     </div>

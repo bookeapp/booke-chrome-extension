@@ -7,7 +7,7 @@ module.exports = () => {
   return {
     entry: "./src/index.js",
     output: {
-      path: path.resolve(__dirname, "build." + Date.now().toString(36)),
+      path: path.resolve(__dirname, "build"),
       filename: "content.js",
     },
     resolve: {
