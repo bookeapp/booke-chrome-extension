@@ -119,11 +119,12 @@ const CurrentAccount = () => {
         const container = node.querySelector(".statement.matched .info.c0");
 
         if (container) {
-          container.classList.add(Css.container);
-
-          container.appendChild(
-            createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
-          );
+          if (!container.classList.contains(Css.container)) {
+            container.classList.add(Css.container);
+            container.appendChild(
+              createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
+            );
+          }
         }
 
         return item;
