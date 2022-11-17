@@ -4,6 +4,8 @@ export const getCurrentView = ({ ui: { currentView } }) => currentView;
 
 export const getPositionY = ({ ui: { positionY } }) => positionY;
 
+export const getCurrentShortCode = ({ ui: { shortCode } }) => shortCode;
+
 export const getTexts = ({ texts }) => texts;
 
 export const getBusinessesData = ({ stats: { data } }) => data;

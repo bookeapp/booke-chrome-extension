@@ -7,7 +7,7 @@ import store from "store";
 const init = () => {
   const rooElement = document.createElement("div");
 
-  rooElement.id = "booke-extension";
+  rooElement.id = "booke-ai-extension";
   document.body.appendChild(rooElement);
 
   const root = ReactDom.createRoot(rooElement);

@@ -1,9 +1,10 @@
 import Css from "./style.module.scss";
 
-import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS } from "const/Constants";
-import { getBusinessesData } from "selectors";
+import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS, RECONCILE_PATH } from "const/Constants";
+import { fetchStats } from "slices";
+import { getBusinessesData, getCurrentShortCode } from "selectors";
 import { log, normalizeId, waitUntil } from "utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
 import IconCheck from "lib/IconCheck";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -24,9 +25,13 @@ const parseTime = (text) => {
 };
 
 const CurrentAccount = () => {
+  const dispatch = useDispatch();
+
   const [{ accountID: accountId }] = useEnvVars();
 
   const businessesData = useSelector(getBusinessesData);
+
+  const currentShortCode = useSelector(getCurrentShortCode);
 
   const [matchedTransactionsIdsHash, setMatchedTransactionsIdsHash] = useState("");
 
@@ -34,28 +39,25 @@ const CurrentAccount = () => {
 
   const [itemsFromBooke, setItemsFromBooke] = useState([]);
 
+  const [fetching, setFetching] = useState(false);
+
   const inProgress = !!currentProgress;
 
   const currentBusiness = useMemo(() => {
     return businessesData.find(({ xeroAccountId }) => {
-      return xeroAccountId === accountId || normalizeId(xeroAccountId) === accountId;
+      return normalizeId(xeroAccountId) === normalizeId(accountId);
     });
   }, [accountId, businessesData]);
 
-  const findMatchedTransactions = useCallback(async() => {
+  const findMatchedTransactions = useCallback(() => {
     try {
       const statementLinesNode = document.querySelector("#statementLines");
 
       if (!statementLinesNode) return;
 
-      await waitUntil(() => {
-        return !statementLinesNode.querySelector(".statement.load");
-      });
-
       const nodes = statementLinesNode.querySelectorAll("[data-statementlineid]");
 
       if (!nodes.length) return;
-
       setMatchedTransactionsIdsHash(JSON.stringify([...nodes].map((node) => node.id).sort()));
     } catch (exception) {}
   }, []);
@@ -82,6 +84,7 @@ const CurrentAccount = () => {
         const amount = spent || received;
 
         return {
+          id,
           addressName: addressNode?.textContent || undefined,
           amount: amount * (spent ? -1 : 1) || undefined,
           description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
@@ -91,10 +94,14 @@ const CurrentAccount = () => {
 
       if (!items.length) return;
 
+      setFetching(true);
+
       const response = await api.checkStatements({
         transactions: items,
         accountId: currentBusiness.xeroAccountId
       });
+
+      setFetching(false);
 
       log({ response });
 
@@ -103,7 +110,9 @@ const CurrentAccount = () => {
       const fromBooke = response.results.map((result, index) => {
         if (!result) return null;
 
-        const node = document.getElementById(ids[index]);
+        const item = items[index];
+
+        const node = document.getElementById(item.id);
 
         if (!node) return null;
 
@@ -117,7 +126,7 @@ const CurrentAccount = () => {
           );
         }
 
-        return ids[index];
+        return item;
       }).filter(Boolean);
 
       setItemsFromBooke(fromBooke);
@@ -126,8 +135,39 @@ const CurrentAccount = () => {
     }
   }, [currentBusiness]);
 
+  const handleStartClick = useCallback(() => {
+    setCurrentProgress({ value: 0 });
+
+    itemsFromBooke.forEach(async(item, index) => {
+      const statement = document.getElementById(item.id);
+
+      if (statement) {
+        const button = statement.querySelector(".okayButton");
+
+        if (button) {
+          button.removeAttribute("href");
+          await waitUntil(() => false, 500 * index); // eslint-disable-line no-magic-numbers
+          button.click();
+
+          setCurrentProgress({ value: (index + 1) / itemsFromBooke.length });
+          if (!(itemsFromBooke.length - index - 1)) {
+            setFetching(true);
+            setItemsFromBooke([]);
+            await api.reconcileStatements({
+              accountId: currentBusiness.xeroAccountId,
+              transactions: itemsFromBooke
+            });
+            setCurrentProgress(null);
+            await dispatch(fetchStats(currentShortCode));
+            setFetching(false);
+          }
+        }
+      }
+    });
+  }, [currentBusiness, itemsFromBooke, currentShortCode, dispatch]);
+
   useEffect(() => {
-    if (!currentBusiness || inProgress) return;
+    if (!currentBusiness || inProgress || fetching) return;
 
     let timeoutId;
 
@@ -142,7 +182,7 @@ const CurrentAccount = () => {
 
     // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [inProgress, currentBusiness, findMatchedTransactions]);
+  }, [inProgress, fetching, currentBusiness, findMatchedTransactions]);
 
   useEffect(() => {
     if (!matchedTransactionsIdsHash) return;
@@ -154,34 +194,7 @@ const CurrentAccount = () => {
     checkTransactions(ids);
   }, [matchedTransactionsIdsHash, checkTransactions]);
 
-  const handleStartClick = useCallback(() => {
-    setCurrentProgress({ value: 0 });
-
-    itemsFromBooke.forEach(async(id, index) => {
-      const statement = document.getElementById(id);
-
-      if (statement) {
-        const button = statement.querySelector(".okayButton");
-
-        if (button) {
-          button.removeAttribute("href");
-          await waitUntil(() => false, 500 * index); // eslint-disable-line no-magic-numbers
-          button.click();
-          setCurrentProgress({ value: itemsFromBooke.length / (index + 1) });
-          if (!itemsFromBooke.length - index - 1) {
-            setItemsFromBooke([]);
-            await api.reconcileStatements({
-              accountId: currentBusiness.xeroAccountId,
-              transactions: itemsFromBooke
-            });
-            setCurrentProgress(null);
-          }
-        }
-      }
-    });
-  }, [currentBusiness, itemsFromBooke]);
-
-  if (!currentBusiness) return null;
+  if (!currentBusiness || location.pathname !== RECONCILE_PATH) return null;
 
   const { name: businessName, transactions } = currentBusiness;
 
@@ -190,12 +203,12 @@ const CurrentAccount = () => {
       <div className={Css.header}>
         <div className={Css.name}>{businessName}</div>
         {!!transactions && (
-          <div className={Css.count}>{`${transactions} transactions`}</div>
+          <div className={Css.count}>{`${itemsFromBooke.length}/${transactions} transactions`}</div>
         )}
       </div>
       {(() => {
         if (currentProgress) {
-          const procents = `${currentProgress.value * PROCENTS}%`;
+          const procents = `${Math.ceil(currentProgress.value * PROCENTS)}%`;
 
           return (
             <div className={Css.progress}>
@@ -216,7 +229,7 @@ const CurrentAccount = () => {
               block
               theme="success"
               onClick={handleStartClick}>
-              Reconcile Booke transactions
+              Reconcile Booke.ai transactions
             </Button>
           );
         }

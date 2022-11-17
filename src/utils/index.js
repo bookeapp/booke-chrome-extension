@@ -111,7 +111,7 @@ export const arraySort = (array, props, orders) => {
 
 export const log = (...args) => {
   // eslint-disable-next-line no-console
-  console.log("%c%s", "color: #ff0", "[BOOKE]", ...args);
+  console.log("%c%s", "color: #ff0", "[BOOKE.AI]", ...args);
 };
 
 export const normalizeId = (id) => {

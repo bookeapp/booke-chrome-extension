@@ -1,5 +1,6 @@
 import Css from "./style.module.scss";
 
+import { RECONCILE_PATH } from "const/Constants";
 import { getBusinessesData } from "selectors";
 import { normalizeId } from "utils";
 import { useSelector } from "react-redux";
@@ -18,8 +19,10 @@ const Accounts = () => {
 
   const filteredBusiness = useMemo(() => {
     return businessesData.filter(({ xeroAccountId, transactions }) => {
-      return xeroAccountId !== accountId
-        && normalizeId(xeroAccountId) !== accountId
+      return (
+        (location.pathname !== RECONCILE_PATH)
+          || (normalizeId(xeroAccountId) !== normalizeId(accountId))
+      )
         && transactions;
     });
   }, [accountId, businessesData]);

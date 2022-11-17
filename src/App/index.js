@@ -2,10 +2,11 @@ import Css from "./style.module.scss";
 
 import { API_CHECK_INTERVAL } from "const/Constants";
 import { fetchStats, uiSlice, userSlice } from "slices";
+import { getCurrentShortCode } from "selectors";
 import { log } from "utils";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Content from "./lib/Content";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import api from "api/Api";
 import authZeroApi from "api/AuthZeroApi";
 
@@ -32,40 +33,46 @@ const getShortCode = () => {
 const App = () => {
   const dispatch = useDispatch();
 
-  const shortCode = useMemo(() => getShortCode(), []);
+  const currentShortCode = useSelector(getCurrentShortCode);
 
-  log({ shortCode });
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const shortCode = getShortCode();
+
+    log({ shortCode });
+
+    if (shortCode) dispatch(uiSlice.actions.setCurrentShortCode(shortCode));
+  }, [dispatch]);
 
   const loadInitialData = useCallback(async() => {
-    if (!shortCode) return;
+    api.setToken(token);
 
-    const token = await authZeroApi.getAuthToken();
+    setInterval(() => {
+      dispatch(fetchStats(currentShortCode));
+    }, [API_CHECK_INTERVAL]);
+
+    await dispatch(fetchStats(currentShortCode));
+
+    dispatch(uiSlice.actions.togglePreloader(false));
+  }, [token, currentShortCode, dispatch]);
+
+  useEffect(() => {
+    authZeroApi.getAuthToken().then((result) => setToken(result));
+    authZeroApi.getUserInfo().then((userData) => {
+      dispatch(userSlice.actions.setUserData(userData));
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!token || !currentShortCode) return;
 
     log({ token: !!token });
 
-    if (token) {
-      api.setToken(token);
-
-      const user = await authZeroApi.getUserInfo();
-
-      dispatch(userSlice.actions.setUserData(user));
-
-      if (shortCode) {
-        await dispatch(fetchStats(shortCode));
-
-        setInterval(() => {
-          dispatch(fetchStats(shortCode));
-        }, [API_CHECK_INTERVAL]);
-      }
-    }
-    dispatch(uiSlice.actions.togglePreloader(false));
-  }, [dispatch, shortCode]);
-
-  useEffect(() => {
     loadInitialData();
-  }, [loadInitialData]);
+  }, [token, currentShortCode, loadInitialData]);
 
-  if (!shortCode) return null;
+  if (!currentShortCode) return null;
 
   return (
     <div className={Css.root}>
