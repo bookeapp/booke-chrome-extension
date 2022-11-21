@@ -5,7 +5,7 @@
   align-items: center;
   padding: $contentDefaultIndent * 2;
   border-radius: $uiBorderRadius;
-  background-color: rgba($uiPositiveColor, 0.1);
+  background-color: rgba($uiMediumDarkColor, 0.1);
   .icon {
     display: flex;
     align-items: center;
@@ -15,12 +15,19 @@
     min-width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: $uiPositiveColor;
-    box-shadow: 0 0 0 4px rgba($uiPositiveColor, 0.2);
+    background-color: $uiMediumDarkColor;
+    box-shadow: 0 0 0 4px rgba($uiMediumDarkColor, 0.2);
   }
   .text {
     flex: auto;
     margin-left: $contentDefaultIndent * 2;
+  }
+  &.success {
+    background-color: rgba($uiPositiveColor, 0.1);
+    .icon {
+      background-color: $uiPositiveColor;
+      box-shadow: 0 0 0 4px rgba($uiPositiveColor, 0.2);
+    }
   }
   &.warning {
     background-color: rgba($uiWarningColor, 0.1);

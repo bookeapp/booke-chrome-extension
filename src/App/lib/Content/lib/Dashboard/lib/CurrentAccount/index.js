@@ -237,12 +237,12 @@ const CurrentAccount = () => {
 
         if (!transactions) {
           return (
-            <EmptyState>No Transactions to reconcile</EmptyState>
+            <EmptyState theme="success">No Transactions to reconcile</EmptyState>
           );
         }
 
         return (
-          <div className={Css.emptyState}>Has no Booke.ai statements on this page</div>
+          <EmptyState>Has no Booke.ai statements on this page</EmptyState>
         );
       })()}
     </div>
