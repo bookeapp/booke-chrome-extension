@@ -2,13 +2,13 @@ import Css from "./style.module.scss";
 
 import { BOTTOM_INDENT, TOP_INDENT, VIEWS } from "const/Constants";
 import { getPositionY, getPreloaderState, getUserData } from "selectors";
+import { getStoreData, setStoreData } from "utils";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
 import AuthZeroApi from "api/AuthZeroApi";
 import Logo from "./lib/Logo";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { getStoreData, setStoreData } from "utils";
 
 const Main = () => {
   const dispatch = useDispatch();
