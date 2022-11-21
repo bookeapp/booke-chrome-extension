@@ -1,6 +1,5 @@
 import Css from "./style.module.scss";
 
-import { RECONCILE_PATH } from "const/Constants";
 import { getBusinessesData } from "selectors";
 import { normalizeId } from "utils";
 import { useSelector } from "react-redux";
@@ -8,24 +7,15 @@ import Badge from "lib/Badge";
 import Button from "lib/Button";
 import EmptyState from "lib/EmptyState";
 import IconArrowRight from "./lib/IconArrowRight";
-import React, { useMemo } from "react";
+import React from "react";
 import Table, { TableCell, TableHead, TableRow } from "lib/Table";
-import useEnvVars from "hooks/useEnvVars";
 
-const Accounts = () => {
-  const [{ accountID: accountId }] = useEnvVars();
-
+const Accounts = ({ currentBusiness }) => {
   const businessesData = useSelector(getBusinessesData);
 
-  const filteredBusiness = useMemo(() => {
-    return businessesData.filter(({ xeroAccountId, transactions }) => {
-      return (
-        (location.pathname !== RECONCILE_PATH)
-          || (normalizeId(xeroAccountId) !== normalizeId(accountId))
-      )
-        && transactions;
-    });
-  }, [accountId, businessesData]);
+  const filteredBusiness = businessesData.filter((business) => {
+    return business.transactions && (!currentBusiness || currentBusiness.xeroAccountId !== business.xeroAccountId);
+  });
 
   if (!businessesData.length) {
     return (

@@ -1,16 +1,15 @@
 import Css from "./style.module.scss";
 
-import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS, RECONCILE_PATH } from "const/Constants";
-import { delay, log, normalizeId, runInSequence } from "utils";
+import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS } from "const/Constants";
+import { delay, log, runInSequence } from "utils";
 import { fetchStats } from "slices";
-import { getBusinessesData, getCurrentShortCode } from "selectors";
+import { getCurrentShortCode } from "selectors";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
 import EmptyState from "lib/EmptyState";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import api from "api/Api";
 import createElement from "utils/createElement";
-import useEnvVars from "hooks/useEnvVars";
 
 const parseTime = (text) => {
   try {
@@ -24,16 +23,16 @@ const parseTime = (text) => {
   return undefined;
 };
 
-const CurrentAccount = () => {
+const CurrentAccount = ({ currentBusiness }) => {
+  const { name: businessName, transactions } = currentBusiness;
+
+  log({ currentBusiness });
+
   const dispatch = useDispatch();
-
-  const [{ accountID: accountId }] = useEnvVars();
-
-  const businessesData = useSelector(getBusinessesData);
 
   const currentShortCode = useSelector(getCurrentShortCode);
 
-  const [matchedTransactionsHash, setMatchedTransactionsHash] = useState("");
+  const [matchedTransactionsHash, setMatchedTransactionsHash] = useState("[]");
 
   const [currentProgress, setCurrentProgress] = useState(null);
 
@@ -42,12 +41,6 @@ const CurrentAccount = () => {
   const [fetching, setFetching] = useState(false);
 
   const inProgress = !!currentProgress;
-
-  const currentBusiness = useMemo(() => {
-    return businessesData.find(({ xeroAccountId }) => {
-      return normalizeId(xeroAccountId) === normalizeId(accountId);
-    });
-  }, [accountId, businessesData]);
 
   const findMatchedTransactions = useCallback(() => {
     log("findMatchedTransactions()");
@@ -237,18 +230,16 @@ const CurrentAccount = () => {
     checkTransactions(items);
   }, [matchedTransactionsHash, checkTransactions]);
 
-  if (!currentBusiness || location.pathname !== RECONCILE_PATH) return null;
-
-  const { name: businessName, transactions } = currentBusiness;
-
   return (
     <div className={Css.currentAccount}>
-      <div className={Css.header}>
-        <div className={Css.name}>{businessName}</div>
-        {!!transactions && (
-          <div className={Css.count}>{`${itemsFromBooke.length}/${transactions} transactions`}</div>
-        )}
-      </div>
+      {!!businessName && !!transactions && (
+        <div className={Css.header}>
+          <div className={Css.name}>{businessName}</div>
+          {!!transactions && (
+            <div className={Css.count}>{`${itemsFromBooke.length}/${transactions} transactions`}</div>
+          )}
+        </div>
+      )}
       {(() => {
         if (currentProgress) {
           const procents = `${Math.ceil(currentProgress.value * PROCENTS)}%`;
