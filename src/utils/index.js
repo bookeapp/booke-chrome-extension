@@ -109,11 +109,6 @@ export const arraySort = (array, props, orders) => {
   });
 };
 
-export const log = (...args) => {
-  // eslint-disable-next-line no-console
-  console.log("%c%s", "color: #ff0", "[BOOKE.AI]", ...args);
-};
-
 export const normalizeId = (id) => {
   return (id || "").replaceAll("-", "").toUpperCase();
 };
@@ -155,3 +150,8 @@ export const waitUntil = (condition, maxTime = DEFAULT_MAX_WAITING_TIME) => {
     }, INTERVAL);
   });
 };
+
+export const log = getStoreData().debug ? (...args) => {
+  // eslint-disable-next-line no-console
+  console.log("%c%s", "color: #ff0", "[BOOKE.AI]", ...args);
+} : () => {};

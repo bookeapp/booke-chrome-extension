@@ -1,5 +1,4 @@
 import { createAuth0Client as createAuthZeroClient } from "@auth0/auth0-spa-js";
-import { log, objectToQueryString, parseQueryString } from "utils";
 
 class AuthZeroApi {
   client = null;
@@ -17,7 +16,7 @@ class AuthZeroApi {
     this.audience = audience;
     this.clientId = clientId;
     this.redirectUrl = window.location.origin;
-    if (location.search.includes("state=")
+    /* TODO if (location.search.includes("state=")
         && (location.search.includes("code=")
         || location.search.includes("error="))) {
       this.getClient().then((client) => {
@@ -31,7 +30,7 @@ class AuthZeroApi {
 
         window.history.replaceState({}, document.title, `${location.pathname}${search ? `?${search}` : search}`);
       });
-    }
+    } */
   }
 
   async getClient() {

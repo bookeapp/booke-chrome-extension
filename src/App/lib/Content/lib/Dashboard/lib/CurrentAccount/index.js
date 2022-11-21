@@ -50,12 +50,17 @@ const CurrentAccount = () => {
   }, [accountId, businessesData]);
 
   const findMatchedTransactions = useCallback(() => {
+    log("findMatchedTransactions()");
     try {
       const statementLinesNode = document.querySelector("#statementLines");
+
+      log("findMatchedTransactions()", { statementLinesNode });
 
       if (!statementLinesNode) return;
 
       const nodes = statementLinesNode.querySelectorAll("[data-statementlineid]");
+
+      log("findMatchedTransactions()", { nodes });
 
       if (!nodes.length) return;
       setMatchedTransactionsIdsHash(JSON.stringify([...nodes].map((node) => node.id).sort()));
@@ -91,6 +96,8 @@ const CurrentAccount = () => {
           timestamp: parseTime(timestampNode?.textContent)
         };
       }).filter(Boolean);
+
+      log({ items });
 
       if (!items.length) return;
 
@@ -130,6 +137,8 @@ const CurrentAccount = () => {
         return item;
       }).filter(Boolean);
 
+      log({ fromBooke });
+
       setItemsFromBooke(fromBooke);
     } catch (exception) {
       log("ERROR getitemsFromBooke", exception);
@@ -147,7 +156,7 @@ const CurrentAccount = () => {
 
         if (button) {
           button.removeAttribute("href");
-          await waitUntil(() => false, 500 * index); // eslint-disable-line no-magic-numbers
+          await waitUntil(() => false, 300 * index); // eslint-disable-line no-magic-numbers
           button.click();
 
           setCurrentProgress({ value: (index + 1) / itemsFromBooke.length });
@@ -186,9 +195,12 @@ const CurrentAccount = () => {
   }, [inProgress, fetching, currentBusiness, findMatchedTransactions]);
 
   useEffect(() => {
+    log({ matchedTransactionsIdsHash });
     if (!matchedTransactionsIdsHash) return;
 
     const ids = JSON.parse(matchedTransactionsIdsHash);
+
+    log({ ids });
 
     if (!ids.length) return;
 

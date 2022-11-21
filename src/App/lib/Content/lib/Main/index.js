@@ -8,6 +8,7 @@ import AuthZeroApi from "api/AuthZeroApi";
 import Logo from "./lib/Logo";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import { getStoreData, setStoreData } from "utils";
 
 const Main = () => {
   const dispatch = useDispatch();
@@ -26,7 +27,17 @@ const Main = () => {
 
   const dragged = !!dragStart;
 
-  const handleButtonClick = useCallback(() => {
+  const handleButtonClick = useCallback((event) => {
+    if (event.shiftKey && event.altKey) {
+      const { debug } = getStoreData();
+
+      setStoreData({ debug: !debug });
+
+      window.location.reload();
+
+      return;
+    }
+
     if (preventClickRef.current) {
       preventClickRef.current = false;
 
