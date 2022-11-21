@@ -15,13 +15,13 @@ class Api extends RestApi {
 
   checkStatements({ accountId, transactions }) {
     return this.post(`${ACCOUNTS}/${accountId}${CHECK}`, null, {
-      transactions: transactions.map(({ id, ...rest }) => btoa(JSON.stringify(rest)))
+      transactions: transactions.map(({ hash }) => hash)
     });
   }
 
   reconcileStatements({ accountId, transactions }) {
     return this.post(`${ACCOUNTS}/${accountId}${RECONCILE}`, null, {
-      transactions: transactions.map(({ id, ...rest }) => btoa(JSON.stringify(rest)))
+      transactions: transactions.map(({ hash }) => hash)
     });
   }
 }

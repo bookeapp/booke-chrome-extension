@@ -1,9 +1,9 @@
 import Css from "./style.module.scss";
 
 import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS, RECONCILE_PATH } from "const/Constants";
+import { delay, log, normalizeId, runInSequence } from "utils";
 import { fetchStats } from "slices";
 import { getBusinessesData, getCurrentShortCode } from "selectors";
-import { log, normalizeId, waitUntil } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
 import EmptyState from "lib/EmptyState";
@@ -33,7 +33,7 @@ const CurrentAccount = () => {
 
   const currentShortCode = useSelector(getCurrentShortCode);
 
-  const [matchedTransactionsIdsHash, setMatchedTransactionsIdsHash] = useState("");
+  const [matchedTransactionsHash, setMatchedTransactionsHash] = useState("");
 
   const [currentProgress, setCurrentProgress] = useState(null);
 
@@ -56,24 +56,17 @@ const CurrentAccount = () => {
 
       log("findMatchedTransactions()", { statementLinesNode });
 
-      if (!statementLinesNode) return;
+      if (!statementLinesNode) return null;
 
-      const nodes = statementLinesNode.querySelectorAll("[data-statementlineid]");
+      const nodes = [...statementLinesNode.querySelectorAll("[data-statementlineid].line")].filter((node) => {
+        return !node.classList.contains("no-display");
+      });
 
       log("findMatchedTransactions()", { nodes });
 
-      if (!nodes.length) return;
-      setMatchedTransactionsIdsHash(JSON.stringify([...nodes].map((node) => node.id).sort()));
-    } catch (exception) {}
-  }, []);
+      if (!nodes.length) return null;
 
-  const checkTransactions = useCallback(async(ids) => {
-    try {
-      const items = ids.map((id) => {
-        const node = document.getElementById(id);
-
-        if (!node) return null;
-
+      return nodes.map((node) => {
         const detailsContainer = node.querySelector(".statement.matched .details-container");
 
         if (!detailsContainer) return null;
@@ -89,17 +82,29 @@ const CurrentAccount = () => {
         const amount = spent || received;
 
         return {
-          id,
-          addressName: addressNode?.textContent || undefined,
-          amount: amount * (spent ? -1 : 1) || undefined,
-          description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
-          timestamp: parseTime(timestampNode?.textContent)
+          id: node.id,
+          hash: btoa(JSON.stringify({
+            addressName: addressNode?.textContent || undefined,
+            amount: amount * (spent ? -1 : 1) || undefined,
+            description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
+            timestamp: parseTime(timestampNode?.textContent)
+          }))
         };
       }).filter(Boolean);
+    } catch (exception) {}
 
+    return null;
+  }, []);
+
+  const checkTransactions = useCallback(async(items) => {
+    try {
       log({ items });
 
-      if (!items.length) return;
+      if (!items.length) {
+        setItemsFromBooke([]);
+
+        return;
+      }
 
       setFetching(true);
 
@@ -112,7 +117,11 @@ const CurrentAccount = () => {
 
       log({ response });
 
-      if (!response || !response.results || !response.results.length) return;
+      if (!response || !response.results || !response.results.length) {
+        setItemsFromBooke([]);
+
+        return;
+      }
 
       const fromBooke = response.results.map((result, index) => {
         if (!result) return null;
@@ -145,35 +154,45 @@ const CurrentAccount = () => {
     }
   }, [currentBusiness]);
 
-  const handleStartClick = useCallback(() => {
+  const handleStartClick = useCallback(async() => {
     setCurrentProgress({ value: 0 });
 
-    itemsFromBooke.forEach(async(item, index) => {
-      const statement = document.getElementById(item.id);
+    const result = (await runInSequence(itemsFromBooke.map((item, index) => {
+      return async() => {
+        await delay(300); // eslint-disable-line no-magic-numbers
 
-      if (statement) {
+        const statement = document.getElementById(item.id);
+
+        if (!statement) return null;
+
         const button = statement.querySelector(".okayButton");
 
-        if (button) {
-          button.removeAttribute("href");
-          await waitUntil(() => false, 300 * index); // eslint-disable-line no-magic-numbers
-          button.click();
+        if (!button) return null;
 
-          setCurrentProgress({ value: (index + 1) / itemsFromBooke.length });
-          if (!(itemsFromBooke.length - index - 1)) {
-            setFetching(true);
-            setItemsFromBooke([]);
-            await api.reconcileStatements({
-              accountId: currentBusiness.xeroAccountId,
-              transactions: itemsFromBooke
-            });
-            setCurrentProgress(null);
-            await dispatch(fetchStats(currentShortCode));
-            setFetching(false);
-          }
-        }
-      }
-    });
+        button.removeAttribute("href");
+
+        button.click();
+
+        setCurrentProgress({ value: (index + 1) / itemsFromBooke.length });
+
+        return item;
+      };
+    }))).filter(Boolean);
+
+    setFetching(true);
+
+    setItemsFromBooke([]);
+
+    if (result.length) {
+      await api.reconcileStatements({
+        accountId: currentBusiness.xeroAccountId,
+        transactions: result
+      });
+    }
+
+    setCurrentProgress(null);
+    await dispatch(fetchStats(currentShortCode));
+    setFetching(false);
   }, [currentBusiness, itemsFromBooke, currentShortCode, dispatch]);
 
   useEffect(() => {
@@ -182,7 +201,10 @@ const CurrentAccount = () => {
     let timeoutId;
 
     const find = () => {
-      findMatchedTransactions();
+      const result = findMatchedTransactions();
+
+      setMatchedTransactionsHash(result ? JSON.stringify(result) : "[]");
+
       timeoutId = setTimeout(() => {
         find();
       }, (FIND_MATCHES_INTERVAL));
@@ -195,17 +217,25 @@ const CurrentAccount = () => {
   }, [inProgress, fetching, currentBusiness, findMatchedTransactions]);
 
   useEffect(() => {
-    log({ matchedTransactionsIdsHash });
-    if (!matchedTransactionsIdsHash) return;
+    log({ matchedTransactionsHash });
+    if (!matchedTransactionsHash) {
+      setItemsFromBooke([]);
 
-    const ids = JSON.parse(matchedTransactionsIdsHash);
+      return;
+    }
 
-    log({ ids });
+    const items = JSON.parse(matchedTransactionsHash);
 
-    if (!ids.length) return;
+    log({ items });
 
-    checkTransactions(ids);
-  }, [matchedTransactionsIdsHash, checkTransactions]);
+    if (!items.length) {
+      setItemsFromBooke([]);
+
+      return;
+    }
+
+    checkTransactions(items);
+  }, [matchedTransactionsHash, checkTransactions]);
 
   if (!currentBusiness || location.pathname !== RECONCILE_PATH) return null;
 
@@ -240,6 +270,7 @@ const CurrentAccount = () => {
           return (
             <Button
               block
+              disabled={fetching}
               theme="success"
               onClick={handleStartClick}>
               Reconcile Booke.ai transactions

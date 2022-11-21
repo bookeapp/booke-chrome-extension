@@ -127,31 +127,35 @@ export const setStoreData = (data) => {
   storageValue(STORAGE_NAME, JSON.stringify({ ...stored, ...data }));
 };
 
-const DEFAULT_MAX_WAITING_TIME = 60000;
-
-const INTERVAL = 50;
-
-export const waitUntil = (condition, maxTime = DEFAULT_MAX_WAITING_TIME) => {
-  const start = Date.now();
-
-  return new Promise((resolve) => {
-    const inervalId = setInterval(() => {
-      try {
-        const result = condition();
-
-        if (result || (Date.now() - start) > maxTime) {
-          clearInterval(inervalId);
-          resolve(result);
-        }
-      } catch (exception) {
-        clearInterval(inervalId);
-        resolve(false);
-      }
-    }, INTERVAL);
-  });
-};
-
 export const log = getStoreData().debug ? (...args) => {
   // eslint-disable-next-line no-console
   console.log("%c%s", "color: #ff0", "[BOOKE.AI]", ...args);
 } : () => {};
+
+export const runInSequence = async(tasks) => {
+  const result = await tasks.reduce(
+    (promiseChain, currentTask) => {
+      return promiseChain.then((chainResults) => currentTask().then((currentResult) => [...chainResults, currentResult]));
+    },
+    Promise.resolve([])
+  );
+
+  return result;
+};
+
+export const delay = async(time) => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+};
+
+export const waitForever = async() => {
+  await new Promise(() => {});
+};
+
+export const loopWhile = async(task, condition = true) => {
+  if (condition) {
+    condition = await task();
+    await loopWhile(task, condition);
+  }
+};
