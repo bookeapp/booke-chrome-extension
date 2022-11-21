@@ -28,15 +28,6 @@ export const userSlice = createSlice({
   }
 });
 
-export const businessesSlice = createSlice({
-  name: "businesses",
-  initialState: {
-    businessesFetching: false,
-    data: []
-  },
-  reducers: {}
-});
-
 export const fetchStats = createAsyncThunk("stats/fetch", async(shortCode) => {
   const response = await api.fetchStats(shortCode);
 
@@ -47,7 +38,7 @@ export const statsSlice = createSlice({
   name: "stats",
   initialState: {
     statsFetching: false,
-    data: []
+    data: null
   },
   reducers: {},
   extraReducers(builder) {

@@ -1,13 +1,12 @@
 import { TOP_INDENT, VIEWS } from "const/Constants";
+import { configureStore } from "@reduxjs/toolkit";
+import { getStoreData, setStoreData } from "utils";
 import {
-  businessesSlice,
   statsSlice,
   textsSlice,
   uiSlice,
   userSlice
 } from "slices";
-import { configureStore } from "@reduxjs/toolkit";
-import { getStoreData, setStoreData } from "utils";
 import defaultTexts from "assets/texts/en.json";
 
 const localStorageMiddleware = (store) => (next) => (action) => {
@@ -36,8 +35,7 @@ export default configureStore({
     ui: uiSlice.reducer,
     texts: textsSlice.reducer,
     user: userSlice.reducer,
-    stats: statsSlice.reducer,
-    businesses: businessesSlice.reducer
+    stats: statsSlice.reducer
   },
   preloadedState: {
     ui: {
@@ -46,13 +44,7 @@ export default configureStore({
       // eslint-disable-next-line no-magic-numbers
       positionY: storedData.positionY || (((window.innerHeight - TOP_INDENT) / 2) + TOP_INDENT)
     },
-    texts: defaultTexts,
-    businesses: {
-      data: [{
-        id: 1,
-        name: "New business from Xero"
-      }]
-    }
+    texts: defaultTexts
   }
 });
 

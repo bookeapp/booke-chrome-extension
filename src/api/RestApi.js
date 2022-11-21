@@ -1,8 +1,6 @@
 import { log, objectToQueryString } from "utils";
 import authZeroApi from "./AuthZeroApi";
 
-const REQUEST_ERROR = "requestError";
-
 const REQUEST_METHODS = {
   GET: "GET",
   POST: "POST",
@@ -88,10 +86,11 @@ class RestApi {
 
         return responseJson;
       }
-      throw REQUEST_ERROR;
     } catch (error) {
-      throw REQUEST_ERROR;
+      log("RestApi.makeRequest ERROR", error);
     }
+
+    return null;
   }
 }
 

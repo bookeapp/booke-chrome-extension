@@ -39,29 +39,6 @@
       }
     }
   }
-  .message {
-    display: flex;
-    align-items: center;
-    padding: $contentDefaultIndent * 2;
-    border-radius: $uiBorderRadius;
-    background-color: rgba($uiPositiveColor, 0.1);
-    .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: $uiWhiteColor;
-      width: 20px;
-      min-width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background-color: $uiPositiveColor;
-      box-shadow: 0 0 0 4px rgba($uiPositiveColor, 0.2);
-    }
-    .text {
-      flex: auto;
-      margin-left: $contentDefaultIndent * 2;
-    }
-  }
 }
 .emptyState {
   line-height: 1.5;

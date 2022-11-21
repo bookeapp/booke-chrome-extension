@@ -6,7 +6,7 @@ import { getBusinessesData, getCurrentShortCode } from "selectors";
 import { log, normalizeId, waitUntil } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
-import IconCheck from "lib/IconCheck";
+import EmptyState from "lib/EmptyState";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import api from "api/Api";
 import createElement from "utils/createElement";
@@ -237,10 +237,7 @@ const CurrentAccount = () => {
 
         if (!transactions) {
           return (
-            <div className={Css.message}>
-              <div className={Css.icon}><IconCheck /></div>
-              <div className={Css.text}>On the <b>{businessName}</b>, all transactions have been successfully reconciled</div>
-            </div>
+            <EmptyState>No Transactions to reconcile</EmptyState>
           );
         }
 

@@ -1,11 +1,13 @@
 @import "./config";
 
-.root {  
+.root {
+  position: relative;
+  z-index: 99;
   color: $uiFontColor;
   font-size: $uiFontSize;
   font-family: $uiFontFamily;
   line-height: 16px;
   &, * {
     box-sizing: border-box;
-  }    
+  }
 }

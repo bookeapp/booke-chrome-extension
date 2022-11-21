@@ -1,0 +1,32 @@
+@import "config";
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  padding: $contentDefaultIndent * 2;
+  border-radius: $uiBorderRadius;
+  background-color: rgba($uiPositiveColor, 0.1);
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $uiWhiteColor;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: $uiPositiveColor;
+    box-shadow: 0 0 0 4px rgba($uiPositiveColor, 0.2);
+  }
+  .text {
+    flex: auto;
+    margin-left: $contentDefaultIndent * 2;
+  }
+  &.warning {
+    background-color: rgba($uiWarningColor, 0.1);
+    .icon {
+      background-color: $uiWarningColor;
+      box-shadow: 0 0 0 4px rgba($uiWarningColor, 0.2);
+    }
+  }
+}

@@ -6,8 +6,8 @@ import { normalizeId } from "utils";
 import { useSelector } from "react-redux";
 import Badge from "lib/Badge";
 import Button from "lib/Button";
+import EmptyState from "lib/EmptyState";
 import IconArrowRight from "./lib/IconArrowRight";
-import IconCheck from "lib/IconCheck";
 import React, { useMemo } from "react";
 import Table, { TableCell, TableHead, TableRow } from "lib/Table";
 import useEnvVars from "hooks/useEnvVars";
@@ -27,15 +27,14 @@ const Accounts = () => {
     });
   }, [accountId, businessesData]);
 
-  if (!filteredBusiness.length) {
-    if (accountId) return null;
-
+  if (!businessesData.length) {
     return (
-      <div className={Css.emptyState}>
-        <div className={Css.icon}><IconCheck /></div>
-        <div>Well done! You have no transactions to reconcile</div>
-      </div>
+      <EmptyState theme="warning">You have no business added to Booke.ai</EmptyState>
     );
+  }
+
+  if (!filteredBusiness.length) {
+    return null;
   }
 
   return (
