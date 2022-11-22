@@ -2,7 +2,7 @@ import Css from "./style.module.scss";
 
 import { API_CHECK_INTERVAL } from "const/Constants";
 import { fetchStats, uiSlice, userSlice } from "slices";
-import { getBusinessesData, getCurrentShortCode } from "selectors";
+import { getCurrentShortCode } from "selectors";
 import { log } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import Content from "./lib/Content";
@@ -34,8 +34,6 @@ const App = () => {
   const dispatch = useDispatch();
 
   const currentShortCode = useSelector(getCurrentShortCode);
-
-  const businessesData = useSelector(getBusinessesData);
 
   const [token, setToken] = useState(null);
 
@@ -83,7 +81,7 @@ const App = () => {
     loadInitialData();
   }, [token, currentShortCode, loadInitialData]);
 
-  if (!currentShortCode || (businessesData && !businessesData.length)) return null;
+  if (!currentShortCode) return null;
 
   return (
     <div className={Css.root}>

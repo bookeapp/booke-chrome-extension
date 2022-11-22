@@ -7,6 +7,7 @@ import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
 import Accounts from "./lib/Accounts";
 import CurrentAccount from "./lib/CurrentAccount";
+import EmptyState from "lib/EmptyState";
 import LogoFull from "./lib/LogoFull";
 import React, { useCallback, useState } from "react";
 import classNames from "classnames";
@@ -46,10 +47,19 @@ const Dashboard = () => {
           <div className={Css.close} onClick={handleCloseClick} />
         </div>
       </div>
-      {!!currentBusiness && (
-        <CurrentAccount currentBusiness={currentBusiness} />
-      )}
-      <Accounts currentBusiness={currentBusiness} />
+      {businessesData.length
+        ? (
+          <>
+            {!!currentBusiness && (
+              <CurrentAccount currentBusiness={currentBusiness} />
+            )}
+            <Accounts currentBusiness={currentBusiness} />
+          </>
+        )
+        : (
+          <EmptyState theme="success">No Booke.ai transactions to reconcile</EmptyState>
+        )}
+
     </div>
   );
 };
