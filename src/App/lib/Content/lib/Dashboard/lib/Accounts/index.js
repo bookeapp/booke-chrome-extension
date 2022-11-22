@@ -14,7 +14,7 @@ const Accounts = ({ currentBusiness }) => {
   const businessesData = useSelector(getBusinessesData);
 
   const filteredBusiness = businessesData.filter((business) => {
-    return business.transactions && (!currentBusiness || currentBusiness.xeroAccountId !== business.xeroAccountId);
+    return !currentBusiness || (currentBusiness.xeroAccountId !== business.xeroAccountId);
   });
 
   if (!businessesData.length) {
@@ -41,7 +41,7 @@ const Accounts = ({ currentBusiness }) => {
               <div className={Css.name} title={name}>{name}</div>
             </TableCell>
             <TableCell className={Css.toReconcileCell}>
-              <Badge className={Css.badge}>{transactions}</Badge>
+              <Badge className={Css.badge} theme={transactions ? "danger" : undefined}>{transactions}</Badge>
             </TableCell>
             <TableCell className={Css.actionCell}>
               <a href={`${window.location.origin}/BankRec/BankRec.aspx?accountID=${normalizeId(xeroAccountId)}`}>
