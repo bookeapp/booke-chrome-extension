@@ -5,7 +5,6 @@ import { normalizeId } from "utils";
 import { useSelector } from "react-redux";
 import Badge from "lib/Badge";
 import Button from "lib/Button";
-import EmptyState from "lib/EmptyState";
 import IconArrowRight from "./lib/IconArrowRight";
 import React from "react";
 import Table, { TableCell, TableHead, TableRow } from "lib/Table";
@@ -16,12 +15,6 @@ const Accounts = ({ currentBusiness }) => {
   const filteredBusiness = businessesData.filter((business) => {
     return !currentBusiness || (currentBusiness.xeroAccountId !== business.xeroAccountId);
   });
-
-  if (!businessesData.length) {
-    return (
-      <EmptyState theme="warning">You have no business added to Booke.ai</EmptyState>
-    );
-  }
 
   if (!filteredBusiness.length) {
     return null;

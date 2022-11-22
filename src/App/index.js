@@ -60,10 +60,19 @@ const App = () => {
   }, [token, currentShortCode, dispatch]);
 
   useEffect(() => {
-    authZeroApi.getAuthToken().then((result) => setToken(result));
-    authZeroApi.getUserInfo().then((userData) => {
-      dispatch(userSlice.actions.setUserData(userData));
-    });
+    (async() => {
+      const result = await authZeroApi.getAuthToken();
+
+      if (result) {
+        setToken(result);
+
+        const userData = await authZeroApi.getUserInfo();
+
+        dispatch(userSlice.actions.setUserData(userData));
+      } else {
+        dispatch(uiSlice.actions.togglePreloader(false));
+      }
+    })();
   }, [dispatch]);
 
   useEffect(() => {
@@ -74,7 +83,7 @@ const App = () => {
     loadInitialData();
   }, [token, currentShortCode, loadInitialData]);
 
-  if (!currentShortCode || !businessesData) return null;
+  if (!currentShortCode || (businessesData && !businessesData.length)) return null;
 
   return (
     <div className={Css.root}>

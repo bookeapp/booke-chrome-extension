@@ -5,9 +5,9 @@ import { getPositionY, getPreloaderState, getUserData } from "selectors";
 import { getStoreData, setStoreData } from "utils";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
-import AuthZeroApi from "api/AuthZeroApi";
 import Logo from "./lib/Logo";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import authZeroApi from "api/AuthZeroApi";
 import classNames from "classnames";
 
 const Main = () => {
@@ -28,14 +28,22 @@ const Main = () => {
   const dragged = !!dragStart;
 
   const handleButtonClick = useCallback((event) => {
-    if (event.shiftKey && event.altKey) {
+    if (event.altKey) {
       const { debug } = getStoreData();
 
-      setStoreData({ debug: !debug });
+      if (event.shiftKey) {
+        setStoreData({ debug: !debug });
 
-      window.location.reload();
+        window.location.reload();
 
-      return;
+        return;
+      }
+
+      if (debug) {
+        authZeroApi.logoutUser();
+
+        return;
+      }
     }
 
     if (preventClickRef.current) {
@@ -47,7 +55,7 @@ const Main = () => {
     if (userData) {
       dispatch(uiSlice.actions.setCurrentView(VIEWS.DASHBOARD));
     } else {
-      AuthZeroApi.loginWithRedirect();
+      authZeroApi.loginWithRedirect();
     }
   }, [dispatch, preloaderShown, userData]);
 
