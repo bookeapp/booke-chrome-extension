@@ -271,7 +271,7 @@ const CurrentAccount = ({ currentBusiness }) => {
 
         if (!transactions) {
           return (
-            <EmptyState theme="success">No Transactions to reconcile</EmptyState>
+            <EmptyState theme="success">No Booke.ai transactions to reconcile</EmptyState>
           );
         }
 
