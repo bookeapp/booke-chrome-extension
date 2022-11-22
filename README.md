@@ -1,2 +1,2 @@
 # booke-chrome-extension
-Booke.ai chrome extension
+Booke AI chrome extension

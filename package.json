@@ -1,7 +1,7 @@
 {
   "name": "booke-chrome-extension",
   "version": "1.0.0",
-  "description": "Booke.ai Chrome extension for Xero",
+  "description": "Booke AI Chrome extension for Xero",
   "main": "index.js",
   "devDependencies": {
     "@babel/core": "^7.20.2",
