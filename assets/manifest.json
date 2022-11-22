@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Booke AI",
+  "name": "Booke AI for Xero",
   "version": "1.0",
-  "description": "Booke AI chrome extension for Xero",
+  "description": "You can perform bulk reconcile for Xero transactions with this extension",
   "icons": {
     "16": "images/icon-16.png",
     "32": "images/icon-32.png",
