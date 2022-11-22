@@ -57,7 +57,7 @@ const Dashboard = () => {
           </>
         )
         : (
-          <EmptyState theme="success">No Booke.ai transactions to reconcile</EmptyState>
+          <EmptyState theme="success">No Booke AI transactions to reconcile</EmptyState>
         )}
 
     </div>

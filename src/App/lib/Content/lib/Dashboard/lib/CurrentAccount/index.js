@@ -271,12 +271,12 @@ const CurrentAccount = ({ currentBusiness }) => {
 
         if (!transactions) {
           return (
-            <EmptyState theme="success">No Booke.ai transactions to reconcile</EmptyState>
+            <EmptyState theme="success">No Booke AI transactions to reconcile</EmptyState>
           );
         }
 
         return (
-          <EmptyState>Has no Booke.ai statements on this page</EmptyState>
+          <EmptyState>Has no Booke AI transactions on this page</EmptyState>
         );
       })()}
     </div>
