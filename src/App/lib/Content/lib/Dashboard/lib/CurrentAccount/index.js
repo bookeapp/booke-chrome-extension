@@ -276,7 +276,7 @@ const CurrentAccount = ({ currentBusiness }) => {
         }
 
         return (
-          <EmptyState>Has no Booke AI transactions on this page</EmptyState>
+          <EmptyState>There are no Booke AI transactions on this page</EmptyState>
         );
       })()}
     </div>
