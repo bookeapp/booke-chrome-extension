@@ -20,7 +20,7 @@ module.exports = () => {
       static: "./",
     },
     plugins: [
-      new Dotenv(),
+      new Dotenv({ path: "./.env.production" }),
       new MiniCssExtractPlugin(),
       new CopyPlugin({
         patterns: [
