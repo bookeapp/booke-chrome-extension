@@ -1,7 +1,7 @@
 import Css from "./style.module.scss";
 
 import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, RECONCILE_PATH, VIEWS } from "const/Constants";
-import { getBusinessesData, getCurrentProgress, getCurrentView, getFetchingState } from "selectors";
+import { getBusinessesData, getCurrentProgress, getCurrentView, getFetchingState, getUserData } from "selectors";
 import { log, normalizeId } from "utils";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,8 +28,6 @@ const findMatchedTransactions = () => {
   log("findMatchedTransactions()");
   try {
     const statementLinesNode = document.querySelector("#statementLines");
-
-    log("findMatchedTransactions()", { statementLinesNode });
 
     if (!statementLinesNode) return null;
 
@@ -74,6 +72,8 @@ const findMatchedTransactions = () => {
 const Content = () => {
   const dispatch = useDispatch();
 
+  const checkAuth = !!useSelector(getUserData);
+
   const [{ accountID: accountId }] = useEnvVars();
 
   const currentViev = useSelector(getCurrentView);
@@ -84,7 +84,7 @@ const Content = () => {
 
   const fetching = useSelector(getFetchingState);
 
-  const [matchedTransactionsHash, setMatchedTransactionsHash] = useState("[]");
+  const [matchedTransactionsHash, setMatchedTransactionsHash] = useState(null);
 
   const currentBusiness = location.pathname === RECONCILE_PATH
     && businessesData && businessesData.find(({ xeroAccountId }) => {
@@ -95,8 +95,16 @@ const Content = () => {
 
   const inProgress = !!currentProgress;
 
-  const checkTransactions = useCallback(async(items) => {
+  const checkTransactions = useCallback(async(hash) => {
+    if (!currentBusiness) return;
+
     try {
+      log({ matchedTransactionsHash: hash });
+
+      if (!hash) return;
+
+      const items = JSON.parse(hash);
+
       log({ items });
 
       if (!items.length) {
@@ -154,14 +162,14 @@ const Content = () => {
   }, [currentBusiness, dispatch]);
 
   useEffect(() => {
-    if (!currentBusiness || inProgress || fetching) return;
+    if (!currentBusiness || inProgress || fetching || !checkAuth) return;
 
     let timeoutId;
 
     const find = () => {
       const result = findMatchedTransactions();
 
-      setMatchedTransactionsHash(result ? JSON.stringify(result) : "[]");
+      setMatchedTransactionsHash(result ? JSON.stringify(result) : null);
 
       timeoutId = setTimeout(() => {
         find();
@@ -172,38 +180,21 @@ const Content = () => {
 
     // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [inProgress, fetching, currentBusiness]);
+  }, [checkAuth, inProgress, fetching, currentBusiness]);
 
   useEffect(() => {
-    log({ matchedTransactionsHash });
-    if (!matchedTransactionsHash) {
-      dispatch(uiSlice.actions.setBookeTransactions([]));
-
-      return;
-    }
-
-    const items = JSON.parse(matchedTransactionsHash);
-
-    log({ items });
-
-    if (!items.length) {
-      dispatch(uiSlice.actions.setBookeTransactions([]));
-
-      return;
-    }
-
-    checkTransactions(items);
+    checkTransactions(matchedTransactionsHash);
   }, [matchedTransactionsHash, checkTransactions, dispatch]);
 
   if (!businessesData) {
-    return (<Main />);
+    return (<Main currentBusiness={currentBusiness} />);
   }
 
   switch (currentViev) {
     case VIEWS.DASHBOARD:
       return (<Dashboard currentBusiness={currentBusiness} />);
     default:
-      return (<Main />);
+      return (<Main currentBusiness={currentBusiness} />);
   }
 };
 

@@ -39,7 +39,6 @@ export default configureStore({
   },
   preloadedState: {
     ui: {
-      transactions: [],
       preloaderShown: true,
       currentView: storedData.currentView || VIEWS.DASHBOARD,
       // eslint-disable-next-line no-magic-numbers

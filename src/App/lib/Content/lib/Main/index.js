@@ -1,7 +1,7 @@
 import Css from "./style.module.scss";
 
 import { BOTTOM_INDENT, TOP_INDENT, VIEWS } from "const/Constants";
-import { getBookeTransactions, getPositionY, getPreloaderState, getUserData } from "selectors";
+import { getBookeTransactions, getBusinessesData, getPositionY, getPreloaderState, getUserData } from "selectors";
 import { getStoreData, setStoreData } from "utils";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import authZeroApi from "api/AuthZeroApi";
 import classNames from "classnames";
 
-const Main = () => {
+const Main = ({ currentBusiness }) => {
   const dispatch = useDispatch();
 
   const preventClickRef = useRef();
@@ -24,11 +24,17 @@ const Main = () => {
 
   const bookeTransactions = useSelector(getBookeTransactions);
 
+  const businessesData = useSelector(getBusinessesData);
+
   const [dragStart, setDragStart] = useState(false);
 
   const [positionY, setPositionY] = useState(initialPositionY);
 
   const dragged = !!dragStart;
+
+  const notificationsCount = currentBusiness
+    ? (bookeTransactions ? bookeTransactions.length : 0)
+    : (businessesData ? businessesData.reduce((accum, { transactions }) => transactions + accum, 0) : 0);
 
   const handleButtonClick = useCallback((event) => {
     if (event.altKey) {
@@ -100,6 +106,17 @@ const Main = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragStart, dispatch, handleButtonClick]);
 
+  const handleWindowResize = useCallback(() => {
+    const newPosition = Math.min(
+      window.innerHeight - BOTTOM_INDENT,
+      Math.max(positionY, TOP_INDENT)
+    );
+
+    setPositionY(newPosition);
+
+    dispatch(uiSlice.actions.setPositionY(newPosition));
+  }, [dispatch, positionY]);
+
   useEffect(() => {
     if (dragged) {
       window.addEventListener("mouseup", handleWindowMouseUp);
@@ -114,6 +131,20 @@ const Main = () => {
     return () => {};
   }, [dragged, handleWindowMouseMove, handleWindowMouseUp]);
 
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowResize);
+    window.addEventListener("orientationchange", handleWindowResize);
+    window.addEventListener("fullscreenchange", handleWindowResize);
+
+    handleWindowResize();
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+      window.removeEventListener("orientationchange", handleWindowResize);
+      window.removeEventListener("fullscreenchange", handleWindowResize);
+    };
+  }, [dragged, handleWindowResize]);
+
   return (
     <div
       className={classNames(Css.main, preloaderShown && Css.preloaderShown)}
@@ -121,7 +152,13 @@ const Main = () => {
       onMouseDown={handleMouseDown}
       onClick={handleButtonClick}>
       <Logo />
-      {!!bookeTransactions.length && <Badge className={Css.badge} theme="danger">{bookeTransactions.length}</Badge>}
+      {!!notificationsCount && (
+        <Badge
+          className={Css.badge}
+          theme={currentBusiness ? "primary" : "danger"}>
+          {notificationsCount}
+        </Badge>
+      )}
     </div>
   );
 };

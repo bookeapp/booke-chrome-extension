@@ -1,8 +1,6 @@
 /node_modules
 /public
-/build
-/build.prod
-/build.stage
+/build*
 /dist
 /_dist
 /assets

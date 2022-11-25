@@ -12,4 +12,8 @@
     color: $uiWhiteColor;
     background-color: $uiNegativeColor;
   }
+  &.primary {
+    color: $uiWhiteColor;
+    background-color: $uiPrimaryColor;
+  }
 }

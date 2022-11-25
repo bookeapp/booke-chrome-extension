@@ -4,7 +4,8 @@ import React from "react";
 import classNames from "classnames";
 
 const THEMES = {
-  danger: Css.danger
+  danger: Css.danger,
+  primary: Css.primary,
 };
 
 const Badge = ({ className, theme, ...restProps }) => {

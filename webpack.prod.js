@@ -3,8 +3,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
 
-module.exports = (...args) => {
-  console.log(args);
+module.exports = () => {
   return {
     entry: "./src/index.js",
     output: {

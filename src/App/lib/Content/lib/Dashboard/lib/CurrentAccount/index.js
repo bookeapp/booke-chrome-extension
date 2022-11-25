@@ -7,6 +7,7 @@ import { getBookeTransactions, getCurrentProgress, getCurrentShortCode, getFetch
 import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
 import EmptyState from "lib/EmptyState";
+import Preloader from "lib/Preloader";
 import React, { useCallback, useState } from "react";
 import api from "api/Api";
 
@@ -68,7 +69,7 @@ const CurrentAccount = ({ currentBusiness }) => {
         <div className={Css.header}>
           <div className={Css.name}>{businessName}</div>
           {!!transactions && (
-            <div className={Css.count}>{`${bookeTransactions.length}/${transactions} transactions`}</div>
+            <div className={Css.count}>{`${(bookeTransactions || []).length}/${transactions} transactions`}</div>
           )}
         </div>
       )}
@@ -87,6 +88,10 @@ const CurrentAccount = ({ currentBusiness }) => {
               </div>
             </div>
           );
+        }
+
+        if (!bookeTransactions) {
+          return <Preloader className={Css.preloader} />;
         }
 
         if (bookeTransactions.length) {
