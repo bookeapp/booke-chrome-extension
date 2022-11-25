@@ -1,5 +1,5 @@
-import { objectToQueryString, parseQueryString } from "utils";
-import { useCallback, useMemo } from "react";
+import { parseQueryString } from "utils";
+import { useMemo } from "react";
 
 const useEnvVars = () => {
   const { search } = window.location;
@@ -8,11 +8,7 @@ const useEnvVars = () => {
     return parseQueryString(search);
   }, [search]);
 
-  const setEnvVars = useCallback((newValues) => {
-    window.location.search = objectToQueryString({ ...envVars, ...newValues });
-  }, [envVars]);
-
-  return [envVars, setEnvVars];
+  return [envVars];
 };
 
 export default useEnvVars;

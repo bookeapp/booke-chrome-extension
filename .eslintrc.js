@@ -88,10 +88,6 @@ module.exports = {
       "warn",
       "always"
     ],
-    "comma-dangle": [
-      "warn",
-      "never"
-    ],
     "comma-spacing": [
       "warn",
       {

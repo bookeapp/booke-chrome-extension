@@ -8,7 +8,10 @@ export const uiSlice = createSlice({
     togglePreloader: (state, { payload }) => ({ ...state, preloaderShown: payload }),
     setCurrentView: (state, { payload }) => ({ ...state, currentView: payload }),
     setPositionY: (state, { payload }) => ({ ...state, positionY: payload }),
-    setCurrentShortCode: (state, { payload }) => ({ ...state, shortCode: payload })
+    setCurrentShortCode: (state, { payload }) => ({ ...state, shortCode: payload }),
+    setCurrentProgress: (state, { payload }) => ({ ...state, currentProgress: payload }),
+    setFetchingState: (state, { payload }) => ({ ...state, fetching: payload }),
+    setBookeTransactions: (state, { payload }) => ({ ...state, transactions: payload }),
   }
 });
 

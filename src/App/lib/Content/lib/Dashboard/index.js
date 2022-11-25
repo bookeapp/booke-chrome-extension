@@ -1,8 +1,7 @@
 import Css from "./style.module.scss";
 
-import { RECONCILE_PATH, VIEWS } from "const/Constants";
+import { VIEWS } from "const/Constants";
 import { getBusinessesData } from "selectors";
-import { normalizeId } from "utils";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
 import Accounts from "./lib/Accounts";
@@ -11,21 +10,13 @@ import EmptyState from "lib/EmptyState";
 import LogoFull from "./lib/LogoFull";
 import React, { useCallback, useState } from "react";
 import classNames from "classnames";
-import useEnvVars from "hooks/useEnvVars";
 
-const Dashboard = () => {
+const Dashboard = ({ currentBusiness }) => {
   const dispatch = useDispatch();
-
-  const [{ accountID: accountId }] = useEnvVars();
 
   const businessesData = useSelector(getBusinessesData);
 
   const [slideToRight, setSlideToRight] = useState(false);
-
-  const currentBusiness = location.pathname === RECONCILE_PATH
-    && businessesData.find(({ xeroAccountId }) => {
-      return normalizeId(xeroAccountId) === normalizeId(accountId);
-    });
 
   const handleCloseClick = useCallback(() => {
     setSlideToRight(true);

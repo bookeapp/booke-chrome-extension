@@ -1,10 +1,11 @@
 import Css from "./style.module.scss";
 
 import { BOTTOM_INDENT, TOP_INDENT, VIEWS } from "const/Constants";
-import { getPositionY, getPreloaderState, getUserData } from "selectors";
+import { getBookeTransactions, getPositionY, getPreloaderState, getUserData } from "selectors";
 import { getStoreData, setStoreData } from "utils";
 import { uiSlice } from "slices";
 import { useDispatch, useSelector } from "react-redux";
+import Badge from "lib/Badge";
 import Logo from "./lib/Logo";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import authZeroApi from "api/AuthZeroApi";
@@ -20,6 +21,8 @@ const Main = () => {
   const initialPositionY = useSelector(getPositionY);
 
   const userData = useSelector(getUserData);
+
+  const bookeTransactions = useSelector(getBookeTransactions);
 
   const [dragStart, setDragStart] = useState(false);
 
@@ -118,6 +121,7 @@ const Main = () => {
       onMouseDown={handleMouseDown}
       onClick={handleButtonClick}>
       <Logo />
+      {!!bookeTransactions.length && <Badge className={Css.badge} theme="danger">{bookeTransactions.length}</Badge>}
     </div>
   );
 };

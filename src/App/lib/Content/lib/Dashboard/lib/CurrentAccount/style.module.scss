@@ -40,32 +40,6 @@
     }
   }
 }
-.emptyState {
-  line-height: 1.5;
-  text-align: center;
-  color: $uiMediumDarkColor;
-  max-width: 180px;
-  padding: $contentDefaultIndent * 2;
-  margin: auto;
-}
-.buttonLogo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  left: 10px;
-  top: 45px;
-  width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background-color: $uiWhiteColor;
-  box-shadow: 0 5px 20px rgba(158, 162, 171, 0.2);
-  img {
-    width: 12px;
-  }
-}
 .container {
   position: relative;
 }

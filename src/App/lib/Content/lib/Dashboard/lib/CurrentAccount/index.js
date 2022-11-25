@@ -1,156 +1,34 @@
 import Css from "./style.module.scss";
 
-import { FIND_MATCHES_INTERVAL, LOGO_IMG_DATA_URI, PROCENTS } from "const/Constants";
-import { delay, log, runInSequence } from "utils";
-import { fetchStats } from "slices";
-import { getCurrentShortCode } from "selectors";
+import { PROCENTS } from "const/Constants";
+import { delay, runInSequence } from "utils";
+import { fetchStats, uiSlice } from "slices";
+import { getBookeTransactions, getCurrentProgress, getCurrentShortCode, getFetchingState } from "selectors";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
 import EmptyState from "lib/EmptyState";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import api from "api/Api";
-import createElement from "utils/createElement";
-
-const parseTime = (text) => {
-  try {
-    const date = new Date(text);
-
-    date.setMinutes(-date.getTimezoneOffset());
-
-    return date.toISOString();
-  } catch (exception) {}
-
-  return undefined;
-};
 
 const CurrentAccount = ({ currentBusiness }) => {
   const { name: businessName, transactions } = currentBusiness;
-
-  log({ currentBusiness });
 
   const dispatch = useDispatch();
 
   const currentShortCode = useSelector(getCurrentShortCode);
 
-  const [matchedTransactionsHash, setMatchedTransactionsHash] = useState("[]");
+  const fetching = useSelector(getFetchingState);
 
-  const [currentProgress, setCurrentProgress] = useState(null);
+  const bookeTransactions = useSelector(getBookeTransactions);
 
-  const [itemsFromBooke, setItemsFromBooke] = useState([]);
+  const currentProgress = useSelector(getCurrentProgress);
 
-  const [fetching, setFetching] = useState(false);
-
-  const inProgress = !!currentProgress;
-
-  const findMatchedTransactions = useCallback(() => {
-    log("findMatchedTransactions()");
-    try {
-      const statementLinesNode = document.querySelector("#statementLines");
-
-      log("findMatchedTransactions()", { statementLinesNode });
-
-      if (!statementLinesNode) return null;
-
-      const nodes = [...statementLinesNode.querySelectorAll("[data-statementlineid].line")].filter((node) => {
-        return !node.classList.contains("no-display");
-      });
-
-      log("findMatchedTransactions()", { nodes });
-
-      if (!nodes.length) return null;
-
-      return nodes.map((node) => {
-        const detailsContainer = node.querySelector(".statement.matched .details-container");
-
-        if (!detailsContainer) return null;
-
-        const [timestampNode, addressNode, descriptionNode] = detailsContainer.querySelectorAll(".details span");
-
-        const [amounNodeSpent, amountNodeReceived] = detailsContainer.querySelectorAll(".amount");
-
-        const spent = (parseFloat(amounNodeSpent?.textContent?.replace(/,/g, "") || 0));
-
-        const received = (parseFloat(amountNodeReceived?.textContent?.replace(/,/g, "") || 0));
-
-        const amount = spent || received;
-
-        return {
-          id: node.id,
-          hash: btoa(JSON.stringify({
-            addressName: addressNode?.textContent || undefined,
-            amount: amount * (spent ? -1 : 1) || undefined,
-            description: descriptionNode?.textContent?.replace("Ref: ", "") || undefined,
-            timestamp: parseTime(timestampNode?.textContent)
-          }))
-        };
-      }).filter(Boolean);
-    } catch (exception) {}
-
-    return null;
-  }, []);
-
-  const checkTransactions = useCallback(async(items) => {
-    try {
-      log({ items });
-
-      if (!items.length) {
-        setItemsFromBooke([]);
-
-        return;
-      }
-
-      setFetching(true);
-
-      const response = await api.checkStatements({
-        transactions: items,
-        accountId: currentBusiness.xeroAccountId
-      });
-
-      setFetching(false);
-
-      log({ response });
-
-      if (!response || !response.results || !response.results.length) {
-        setItemsFromBooke([]);
-
-        return;
-      }
-
-      const fromBooke = response.results.map((result, index) => {
-        if (!result) return null;
-
-        const item = items[index];
-
-        const node = document.getElementById(item.id);
-
-        if (!node) return null;
-
-        const container = node.querySelector(".statement.matched .info.c0");
-
-        if (container) {
-          if (!container.classList.contains(Css.container)) {
-            container.classList.add(Css.container);
-            container.appendChild(
-              createElement("div", { className: Css.buttonLogo }, createElement("img", { src: LOGO_IMG_DATA_URI }))
-            );
-          }
-        }
-
-        return item;
-      }).filter(Boolean);
-
-      log({ fromBooke });
-
-      setItemsFromBooke(fromBooke);
-    } catch (exception) {
-      log("ERROR getitemsFromBooke", exception);
-    }
-  }, [currentBusiness]);
+  const [, setFetching] = useState(false);
 
   const handleStartClick = useCallback(async() => {
-    setCurrentProgress({ value: 0 });
+    dispatch(uiSlice.actions.setCurrentProgress({ value: 0 }));
 
-    const result = (await runInSequence(itemsFromBooke.map((item, index) => {
+    const result = (await runInSequence(bookeTransactions.map((item, index) => {
       return async() => {
         await delay(300); // eslint-disable-line no-magic-numbers
 
@@ -161,12 +39,9 @@ const CurrentAccount = ({ currentBusiness }) => {
         const button = statement.querySelector(".okayButton");
 
         if (!button) return null;
-
         button.removeAttribute("href");
-
         button.click();
-
-        setCurrentProgress({ value: (index + 1) / itemsFromBooke.length });
+        dispatch(uiSlice.actions.setCurrentProgress({ value: (index + 1) / bookeTransactions.length }));
 
         return item;
       };
@@ -174,7 +49,7 @@ const CurrentAccount = ({ currentBusiness }) => {
 
     setFetching(true);
 
-    setItemsFromBooke([]);
+    dispatch(uiSlice.actions.setBookeTransactions([]));
 
     if (result.length) {
       await api.reconcileStatements({
@@ -182,53 +57,10 @@ const CurrentAccount = ({ currentBusiness }) => {
         transactions: result
       });
     }
-
-    setCurrentProgress(null);
+    dispatch(uiSlice.actions.setCurrentProgress(null));
     await dispatch(fetchStats(currentShortCode));
     setFetching(false);
-  }, [currentBusiness, itemsFromBooke, currentShortCode, dispatch]);
-
-  useEffect(() => {
-    if (!currentBusiness || inProgress || fetching) return;
-
-    let timeoutId;
-
-    const find = () => {
-      const result = findMatchedTransactions();
-
-      setMatchedTransactionsHash(result ? JSON.stringify(result) : "[]");
-
-      timeoutId = setTimeout(() => {
-        find();
-      }, (FIND_MATCHES_INTERVAL));
-    };
-
-    find();
-
-    // eslint-disable-next-line consistent-return
-    return () => clearTimeout(timeoutId);
-  }, [inProgress, fetching, currentBusiness, findMatchedTransactions]);
-
-  useEffect(() => {
-    log({ matchedTransactionsHash });
-    if (!matchedTransactionsHash) {
-      setItemsFromBooke([]);
-
-      return;
-    }
-
-    const items = JSON.parse(matchedTransactionsHash);
-
-    log({ items });
-
-    if (!items.length) {
-      setItemsFromBooke([]);
-
-      return;
-    }
-
-    checkTransactions(items);
-  }, [matchedTransactionsHash, checkTransactions]);
+  }, [currentBusiness, bookeTransactions, currentShortCode, dispatch]);
 
   return (
     <div className={Css.currentAccount}>
@@ -236,7 +68,7 @@ const CurrentAccount = ({ currentBusiness }) => {
         <div className={Css.header}>
           <div className={Css.name}>{businessName}</div>
           {!!transactions && (
-            <div className={Css.count}>{`${itemsFromBooke.length}/${transactions} transactions`}</div>
+            <div className={Css.count}>{`${bookeTransactions.length}/${transactions} transactions`}</div>
           )}
         </div>
       )}
@@ -257,14 +89,14 @@ const CurrentAccount = ({ currentBusiness }) => {
           );
         }
 
-        if (itemsFromBooke.length) {
+        if (bookeTransactions.length) {
           return (
             <Button
               block
               disabled={fetching}
               theme="success"
               onClick={handleStartClick}>
-              Reconcile Booke.ai transactions
+              {`Reconcile ${bookeTransactions.length} Booke AI transactions`}
             </Button>
           );
         }
