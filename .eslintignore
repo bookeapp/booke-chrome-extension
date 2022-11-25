@@ -5,6 +5,4 @@
 /_dist
 /assets
 .eslintrc.js
-webpack.dev.js
-webpack.prod.js
-webpack.demo.js
+webpack*

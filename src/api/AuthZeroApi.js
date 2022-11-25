@@ -117,9 +117,9 @@ class AuthZeroApi {
 }
 
 const authZeroApi = new AuthZeroApi(
-  process.env.AUTH_DOMAIN,
-  process.env.AUTH_AUDIENCE,
-  process.env.AUTH_CLIENT_ID
+  process.env.AUTH_ZERO_DOMAIN,
+  process.env.AUTH_ZERO_AUDIENCE,
+  process.env.AUTH_ZERO_CLIENT_ID
 );
 
 export default authZeroApi;
