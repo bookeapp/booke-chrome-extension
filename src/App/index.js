@@ -24,7 +24,7 @@ const getShortCode = () => {
 
     const [,, part] = window.location.pathname.split("/");
 
-    if (/^[!A-Z0-9]{6}$/.test(part)) return part;
+    if (/^[!A-Z0-9]{6}$/i.test(part)) return part;
   } catch (exeption) {}
 
   return null;
