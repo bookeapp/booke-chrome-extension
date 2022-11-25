@@ -1,16 +1,15 @@
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
-const CopyPlugin = require("copy-webpack-plugin");
 
-const MODE_PRODUCTION = "production";
+module.exports = ({ production }, { mode }) => {
+  const isDevMode = node = "development";
 
-const MODE_DEVELOPMENT = "development";
-
-module.exports = () => {
   return {
     entry: "./src/index.js",
     output: {
-      path: path.resolve(__dirname, "dist"),
+      path: path.resolve(__dirname, isDevMode ? "dist" : "build"),
       filename: "content.js",
     },
     resolve: {
@@ -19,14 +18,6 @@ module.exports = () => {
         "node_modules"
       ],
     },
-    plugins: [
-      new Dotenv(),
-      new CopyPlugin({
-        patterns: [
-          { from: "public" }
-        ],
-      }),
-    ],
     devServer: {
       static: {
         directory: path.resolve(__dirname, "dist"),
@@ -34,6 +25,15 @@ module.exports = () => {
       historyApiFallback: true,
       port: 3000,
     },
+    plugins: [
+      new Dotenv(),
+      new MiniCssExtractPlugin(),
+      new CopyPlugin({
+        patterns: [
+          { from: "assets" }
+        ],
+      }),
+    ].filter(Boolean),
     module: {
       rules: [
         {
@@ -53,9 +53,7 @@ module.exports = () => {
           test: /\.scss$/i,
           exclude: /node_modules/,
           use: [
-            {
-              loader: "style-loader",
-            },
+            MiniCssExtractPlugin.loader,
             {
               loader: "css-loader",
               options: {
@@ -67,7 +65,7 @@ module.exports = () => {
             },
           ],
         },
-      ],
+      ]
     }
   };
 }
