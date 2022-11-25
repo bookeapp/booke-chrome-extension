@@ -31,8 +31,8 @@
     "lint": "eslint ./src/**/*.js",
     "watch": "webpack --watch --config webpack.dev.js --mode development",
     "start": "webpack serve --config webpack.dev.js --mode development",
-    "build": "webpack --config webpack.stage.js --mode production",
-    "build-prod": "webpack --config webpack.prod.js --mode production --env=production"
+    "build-stage": "webpack --config webpack.stage.js --mode production",
+    "build": "webpack --config webpack.prod.js --mode production --env=production"
   },
   "repository": {
     "type": "git",

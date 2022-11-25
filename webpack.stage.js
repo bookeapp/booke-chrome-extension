@@ -8,7 +8,7 @@ module.exports = (...args) => {
   return {
     entry: "./src/index.js",
     output: {
-      path: path.resolve(__dirname, "build"),
+      path: path.resolve(__dirname, "build.stage"),
       filename: "content.js",
     },
     resolve: {
