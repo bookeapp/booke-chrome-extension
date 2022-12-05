@@ -5,6 +5,9 @@ import ReactDom from "react-dom/client";
 import store from "store";
 
 const init = () => {
+  // eslint-disable-next-line no-console
+  console.log("BOOKE AI VERSION:", process.env.APP_VERSION);
+
   const rooElement = document.createElement("div");
 
   rooElement.id = "booke-ai-extension";

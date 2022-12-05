@@ -40,7 +40,7 @@ const App = () => {
   useEffect(() => {
     const shortCode = getShortCode();
 
-    log({ shortCode });
+    log("shortCode:", shortCode);
 
     if (shortCode) dispatch(uiSlice.actions.setCurrentShortCode(shortCode));
   }, [dispatch]);
@@ -76,7 +76,7 @@ const App = () => {
   useEffect(() => {
     if (!token || !currentShortCode) return;
 
-    log({ token: !!token });
+    log("has token:", !!token);
 
     loadInitialData();
   }, [token, currentShortCode, loadInitialData]);

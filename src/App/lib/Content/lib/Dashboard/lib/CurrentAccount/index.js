@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "lib/Button";
 import EmptyState from "lib/EmptyState";
 import Preloader from "lib/Preloader";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import api from "api/Api";
 
 const CurrentAccount = ({ currentBusiness }) => {
@@ -23,8 +23,6 @@ const CurrentAccount = ({ currentBusiness }) => {
   const bookeTransactions = useSelector(getBookeTransactions);
 
   const currentProgress = useSelector(getCurrentProgress);
-
-  const [, setFetching] = useState(false);
 
   const handleStartClick = useCallback(async() => {
     dispatch(uiSlice.actions.setCurrentProgress({ value: 0 }));
@@ -48,19 +46,17 @@ const CurrentAccount = ({ currentBusiness }) => {
       };
     }))).filter(Boolean);
 
-    setFetching(true);
-
+    dispatch(uiSlice.actions.setFetchingState(true));
     dispatch(uiSlice.actions.setBookeTransactions([]));
-
     if (result.length) {
       await api.reconcileStatements({
         accountId: currentBusiness.xeroAccountId,
         transactions: result
       });
     }
-    dispatch(uiSlice.actions.setCurrentProgress(null));
     await dispatch(fetchStats(currentShortCode));
-    setFetching(false);
+    dispatch(uiSlice.actions.setCurrentProgress(null));
+    dispatch(uiSlice.actions.setFetchingState(false));
   }, [currentBusiness, bookeTransactions, currentShortCode, dispatch]);
 
   return (

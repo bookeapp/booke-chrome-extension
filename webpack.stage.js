@@ -2,8 +2,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
+const DefinePlugin = require("webpack").DefinePlugin;
 
 module.exports = () => {
+
   return {
     entry: "./src/index.js",
     output: {
@@ -27,6 +29,9 @@ module.exports = () => {
           { from: "assets" }
         ],
       }),
+      new DefinePlugin({
+        "process.env.APP_VERSION": JSON.stringify("STAGE." + (new Date()).toISOString().split(":").slice(0, 2).join(":")),
+      })
     ],
     module: {
       rules: [

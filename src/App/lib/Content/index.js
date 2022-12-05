@@ -25,7 +25,6 @@ const parseTime = (text) => {
 };
 
 const findMatchedTransactions = () => {
-  log("findMatchedTransactions()");
   try {
     const statementLinesNode = document.querySelector("#statementLines");
 
@@ -34,8 +33,6 @@ const findMatchedTransactions = () => {
     const nodes = [...statementLinesNode.querySelectorAll("[data-statementlineid].line")].filter((node) => {
       return !node.classList.contains("no-display");
     });
-
-    log("findMatchedTransactions()", { nodes });
 
     if (!nodes.length) return null;
 
@@ -72,7 +69,7 @@ const findMatchedTransactions = () => {
 const Content = () => {
   const dispatch = useDispatch();
 
-  const checkAuth = !!useSelector(getUserData);
+  const checkUserData = !!useSelector(getUserData);
 
   const [{ accountID: accountId }] = useEnvVars();
 
@@ -87,25 +84,25 @@ const Content = () => {
   const [matchedTransactionsHash, setMatchedTransactionsHash] = useState(null);
 
   const currentBusiness = location.pathname === RECONCILE_PATH
-    && businessesData && businessesData.find(({ xeroAccountId }) => {
-    return normalizeId(xeroAccountId) === normalizeId(accountId);
+    && businessesData && businessesData.find(({ xeroAccountId: id }) => {
+    return normalizeId(id) === normalizeId(accountId);
   });
-
-  log({ currentBusiness });
 
   const inProgress = !!currentProgress;
 
+  const reconcilePage = !!currentBusiness;
+
+  const xeroAccountId = currentBusiness ? currentBusiness.xeroAccountId : null;
+
   const checkTransactions = useCallback(async(hash) => {
-    if (!currentBusiness) return;
+    if (!reconcilePage) return;
 
     try {
-      log({ matchedTransactionsHash: hash });
+      log("transactions hash:", hash);
 
       if (!hash) return;
 
       const items = JSON.parse(hash);
-
-      log({ items });
 
       if (!items.length) {
         dispatch(uiSlice.actions.setBookeTransactions([]));
@@ -117,12 +114,10 @@ const Content = () => {
 
       const response = await api.checkStatements({
         transactions: items,
-        accountId: currentBusiness.xeroAccountId
+        accountId: xeroAccountId
       });
 
-      dispatch(uiSlice.actions.setFetchingState(true));
-
-      log({ response });
+      dispatch(uiSlice.actions.setFetchingState(false));
 
       if (!response || !response.results || !response.results.length) {
         dispatch(uiSlice.actions.setBookeTransactions([]));
@@ -153,22 +148,32 @@ const Content = () => {
         return item;
       }).filter(Boolean);
 
-      log({ fromBooke });
+      log("transactions to reconcile:", fromBooke);
 
       dispatch(uiSlice.actions.setBookeTransactions(fromBooke));
     } catch (exception) {
       log("ERROR getitemsFromBooke", exception);
     }
-  }, [currentBusiness, dispatch]);
+  }, [reconcilePage, xeroAccountId, dispatch]);
 
   useEffect(() => {
-    if (!currentBusiness || inProgress || fetching || !checkAuth) return;
+    if (!reconcilePage || inProgress || fetching || !checkUserData) {
+      log("findMatchedTransactions() SKIPPED", {
+        "!reconcilePage": !reconcilePage,
+        "!checkUserData": !checkUserData,
+        inProgress,
+        fetching,
+      });
+
+      return;
+    }
 
     let timeoutId;
 
     const find = () => {
       const result = findMatchedTransactions();
 
+      log("findMatchedTransactions() result:", result);
       setMatchedTransactionsHash(result ? JSON.stringify(result) : null);
 
       timeoutId = setTimeout(() => {
@@ -180,11 +185,15 @@ const Content = () => {
 
     // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [checkAuth, inProgress, fetching, currentBusiness]);
+  }, [checkUserData, inProgress, fetching, reconcilePage]);
 
   useEffect(() => {
     checkTransactions(matchedTransactionsHash);
   }, [matchedTransactionsHash, checkTransactions, dispatch]);
+
+  useEffect(() => {
+    log("currentBusiness:", currentBusiness);
+  }, [currentBusiness]);
 
   if (!businessesData) {
     return (<Main currentBusiness={currentBusiness} />);
