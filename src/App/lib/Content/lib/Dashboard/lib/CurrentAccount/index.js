@@ -1,7 +1,7 @@
 import Css from "./style.module.scss";
 
-import { PROCENTS } from "const/Constants";
-import { delay, runInSequence } from "utils";
+import { GTAG_EVENT_BULK_RECONCILE, PROCENTS, RECONCILE_BUTTON_CLICK_INTERVAL } from "const/Constants";
+import { delay, gtagEvent, runInSequence } from "utils";
 import { fetchStats, uiSlice } from "slices";
 import { getBookeTransactions, getCurrentProgress, getCurrentShortCode, getFetchingState } from "selectors";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,11 +25,14 @@ const CurrentAccount = ({ currentBusiness }) => {
   const currentProgress = useSelector(getCurrentProgress);
 
   const handleStartClick = useCallback(async() => {
+    gtagEvent(GTAG_EVENT_BULK_RECONCILE, {
+      busienss: businessName
+    });
     dispatch(uiSlice.actions.setCurrentProgress({ value: 0 }));
 
     const result = (await runInSequence(bookeTransactions.map((item, index) => {
       return async() => {
-        await delay(300); // eslint-disable-line no-magic-numbers
+        await delay(RECONCILE_BUTTON_CLICK_INTERVAL);
 
         const statement = document.getElementById(item.id);
 
@@ -57,7 +60,7 @@ const CurrentAccount = ({ currentBusiness }) => {
     await dispatch(fetchStats(currentShortCode));
     dispatch(uiSlice.actions.setCurrentProgress(null));
     dispatch(uiSlice.actions.setFetchingState(false));
-  }, [currentBusiness, bookeTransactions, currentShortCode, dispatch]);
+  }, [businessName, dispatch, bookeTransactions, currentShortCode, currentBusiness]);
 
   return (
     <div className={Css.currentAccount}>

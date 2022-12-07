@@ -1,4 +1,4 @@
-import { STORAGE_NAME } from "const/Constants";
+import { GOOGLE_ID, STORAGE_NAME } from "const/Constants";
 
 export const setTimeout = (callback, interval, ...restArgs) => {
   const timeoutId = window.setTimeout(callback, interval, ...restArgs);
@@ -149,13 +149,37 @@ export const delay = async(time) => {
   });
 };
 
-export const waitForever = async() => {
-  await new Promise(() => {});
-};
-
 export const loopWhile = async(task, condition = true) => {
   if (condition) {
     condition = await task();
     await loopWhile(task, condition);
+  }
+};
+
+export const addGoogleAnalytic = () => {
+  log("addGoogleAnalytic()");
+  /* eslint-disable */
+  try {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ID}`;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = () => {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", GOOGLE_ID);
+  } catch (exception) {
+    console.log("BOOKE.AI addGoogleAnalytic() exceptionm", exception);
+  }
+  /* eslint-enable */
+};
+
+export const gtagEvent = (type, params) => {
+  try {
+    window.gtag("event", type, params);
+  } catch (exception) {
+    // eslint-disable-next-line no-console
+    console.log("BOOKE.AI gtagEvent() exceptionm", exception);
   }
 };

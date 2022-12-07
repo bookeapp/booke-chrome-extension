@@ -1,4 +1,5 @@
 import { Provider } from "react-redux";
+import { addGoogleAnalytic } from "utils";
 import App from "App";
 import React from "react";
 import ReactDom from "react-dom/client";
@@ -14,6 +15,8 @@ const init = () => {
   document.body.appendChild(rooElement);
 
   const root = ReactDom.createRoot(rooElement);
+
+  addGoogleAnalytic();
 
   root.render(
     <Provider store={store}>

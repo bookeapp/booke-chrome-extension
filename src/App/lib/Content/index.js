@@ -83,6 +83,8 @@ const Content = () => {
 
   const [matchedTransactionsHash, setMatchedTransactionsHash] = useState(null);
 
+  const [inited, setInited] = useState(false);
+
   const currentBusiness = location.pathname === RECONCILE_PATH
     && businessesData && businessesData.find(({ xeroAccountId: id }) => {
     return normalizeId(id) === normalizeId(accountId);
@@ -176,6 +178,11 @@ const Content = () => {
       log("findMatchedTransactions() result:", result);
       setMatchedTransactionsHash(result ? JSON.stringify(result) : null);
 
+      if (!inited) {
+        dispatch(uiSlice.actions.setBookeTransactions([]));
+        setInited(true);
+      }
+
       timeoutId = setTimeout(() => {
         find();
       }, (FIND_MATCHES_INTERVAL));
@@ -185,7 +192,7 @@ const Content = () => {
 
     // eslint-disable-next-line consistent-return
     return () => clearTimeout(timeoutId);
-  }, [checkUserData, inProgress, fetching, reconcilePage]);
+  }, [inited, checkUserData, inProgress, fetching, dispatch, reconcilePage]);
 
   useEffect(() => {
     checkTransactions(matchedTransactionsHash);
